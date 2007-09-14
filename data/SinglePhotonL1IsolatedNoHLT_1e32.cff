@@ -1,0 +1,43 @@
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoRecoEcalCandidate.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoPhotonEcalIsol.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsolatedPhotonHcalIsol.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoEgammaRegionalRecoTracker.cff"	
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoPhotonTrackIsol.cff"
+
+
+## include "RecoEgamma/EgammaHLTProducers/data/hltSinglePhotonEcalIsol.cfi"
+## include "RecoEgamma/EgammaHLTProducers/data/hltSinglePhotonHcalIsol.cfi"
+## include "RecoEgamma/EgammaHLTProducers/data/hltSinglePhotonTrackIsol.cfi"
+
+## include "HLTrigger/Egamma/data/hltSinglePhotonEtFilter.cfi"
+## include "HLTrigger/Egamma/data/hltSinglePhotonEcalIsolFilter.cfi"
+## include "HLTrigger/Egamma/data/hltSinglePhotonHcalIsolFilter.cfi"
+## include "HLTrigger/Egamma/data/hltSinglePhotonTrackIsolFilter.cfi"
+
+#--------------------------------------------------------------------#
+# MC ETA CUT
+#--------------------------------------------------------------------#
+include "HLTriggerOffline/Egamma/data/mcSinglePhotonEtaFilter.cfi"
+
+  sequence singlePhotonL1IsolatedNoHLT = {
+                           mcSinglePhotonEtaFilter&
+	                   hltBegin&
+                           ##doL1T &
+                           l1seedSingle & 
+		           doRegionalEgammaEcal &
+# 		           doLocalEcal &
+                           l1IsolatedEcalClusters  &
+                           l1IsoRecoEcalCandidate &
+#                           hltL1IsoSinglePhotonL1MatchFilter &
+#                           hltL1IsoSinglePhotonEtFilter & 
+	                   l1IsolatedPhotonEcalIsol & 
+#                           hltL1IsoSinglePhotonEcalIsolFilter &
+                           doLocalHcalWithoutHO &
+                           l1IsolatedPhotonHcalIsol & 
+#                           hltL1IsoSinglePhotonHcalIsolFilter &
+                           doLocalTracker &
+                           l1IsoEgammaRegionalRecoTracker &
+                           l1IsoPhotonTrackIsol
+#                          hltL1IsoSinglePhotonTrackIsolFilter &
+#                           singlePhotonL1IsoPresc
+	                  }

@@ -1,0 +1,58 @@
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoRecoEcalCandidate.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1NonIsoRecoEcalCandidate.cff"
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoPhotonEcalIsol.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1NonIsoPhotonEcalIsol.cff"
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsolatedPhotonHcalIsol.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1NonIsolatedPhotonHcalIsol.cff"
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoEgammaRegionalRecoTracker.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1NonIsoEgammaRegionalRecoTracker.cff"
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoPhotonTrackIsol.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1NonIsoPhotonTrackIsol.cff"
+
+
+## include "RecoEgamma/EgammaHLTProducers/data/hltSinglePhotonEcalIsol.cfi"
+## include "RecoEgamma/EgammaHLTProducers/data/hltSinglePhotonHcalIsol.cfi"
+## include "RecoEgamma/EgammaHLTProducers/data/hltSinglePhotonTrackIsol.cfi"
+
+## include "HLTrigger/Egamma/data/hltSinglePhotonEtFilter.cfi"
+## include "HLTrigger/Egamma/data/hltSinglePhotonEcalIsolFilter.cfi"
+## include "HLTrigger/Egamma/data/hltSinglePhotonHcalIsolFilter.cfi"
+## include "HLTrigger/Egamma/data/hltSinglePhotonTrackIsolFilter.cfi"
+
+#--------------------------------------------------------------------#
+# MC ETA CUT
+#--------------------------------------------------------------------#
+include "HLTriggerOffline/Egamma/data/mcSinglePhotonEtaFilter.cfi"
+
+  sequence singlePhotonL1NonIsolatedNoHLT = {
+                          mcSinglePhotonEtaFilter&
+	                   hltBegin&
+                           ##doL1T &
+                           l1seedRelaxedSingle &
+ 		           doRegionalEgammaEcal &
+# 		           doLocalEcal &
+                           l1IsolatedEcalClusters  &
+                           l1NonIsolatedEcalClusters  &
+                           l1IsoRecoEcalCandidate &
+                           l1NonIsoRecoEcalCandidate &
+#                           hltL1NonIsoSinglePhotonL1MatchFilterRegional &
+#                           hltL1NonIsoSinglePhotonEtFilter & 
+	                   l1IsolatedPhotonEcalIsol & 
+	                   l1NonIsolatedPhotonEcalIsol & 
+#		           hltL1NonIsoSinglePhotonEcalIsolFilter &
+                           doLocalHcalWithoutHO &
+                           l1IsolatedPhotonHcalIsol & 
+                           l1NonIsolatedPhotonHcalIsol & 
+#                           hltL1NonIsoSinglePhotonHcalIsolFilter &
+                           doLocalTracker &
+                           l1IsoEgammaRegionalRecoTracker &
+                           l1NonIsoEgammaRegionalRecoTracker &
+                           l1IsoPhotonTrackIsol & 
+                           l1NonIsoPhotonTrackIsol
+#                           hltL1NonIsoSinglePhotonTrackIsolFilter &
+#                           singlePhotonL1NonIsoPresc
+	                  }

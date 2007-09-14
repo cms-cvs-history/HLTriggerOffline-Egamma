@@ -1,0 +1,65 @@
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoRecoEcalCandidate.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1NonIsoRecoEcalCandidate.cff"
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsolatedElectronHcalIsol.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1NonIsolatedElectronHcalIsol.cff"
+ 
+ include "RecoEgamma/EgammaHLTProducers/data/pixelMatchElectronL1IsoSequenceForHLT.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/pixelMatchElectronL1NonIsoSequenceForHLT.cff"
+
+ include "RecoEgamma/EgammaHLTProducers/data/pixelMatchElectronL1IsoTrackingSequenceForHLT.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/pixelMatchElectronL1NonIsoTrackingSequenceForHLT.cff"
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoElectronsRegionalRecoTracker.cff"	
+ include "RecoEgamma/EgammaHLTProducers/data/l1NonIsoElectronsRegionalRecoTracker.cff"
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoElectronTrackIsol.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1NonIsoElectronTrackIsol.cff"
+
+
+### include "RecoEgamma/EgammaHLTProducers/data/hltSingleElectronHcalIsol.cfi"
+### include "RecoEgamma/EgammaHLTProducers/data/hltSingleElectronTrackIsol.cfi"
+
+#----------- filter modules for the sequence --------------------------------#
+#--------------------------------------------------------------------#
+# MC ETA CUT
+#--------------------------------------------------------------------#
+include "HLTriggerOffline/Egamma/data/mcSingleElectronEtaFilter.cfi"
+
+  sequence singleElectronL1NonIsolatedNoHLT = {
+                            mcSingleElectronEtaFilter&
+	                           hltBegin& 
+                                      ##doL1T &
+                             l1seedRelaxedSingle &
+		           doRegionalEgammaEcal &
+#	                  doLocalEcal &
+                               l1IsolatedEcalClusters &
+                               l1NonIsolatedEcalClusters &
+                               l1IsoRecoEcalCandidate &
+                               l1NonIsoRecoEcalCandidate &
+#                             hltL1NonIsoSingleElectronL1MatchNoFilterRegional &
+#                             hltL1NonIsoSingleElectronEtNoFilter &
+                          doLocalHcalWithoutHO &
+                               l1IsolatedElectronHcalIsol & 
+                               l1NonIsolatedElectronHcalIsol & 
+#                             hltL1NonIsoSingleElectronHcalIsolNoFilter &
+                             ##### trackerlocalreco &              
+                          doLocalPixel & // pixel rechit for SC-pixel matching
+	                       pixelMatchElectronL1IsoSequenceForHLT & 
+	                       pixelMatchElectronL1NonIsoSequenceForHLT & 
+#                             hltL1NonIsoSingleElectronPixelMatchNoFilter &
+			  doLocalStrip & // strip rechit for the electron tracking
+                               pixelMatchElectronL1IsoTrackingSequenceForHLT &
+                               pixelMatchElectronL1NonIsoTrackingSequenceForHLT &
+#                             hltL1NonIsoSingleElectronEoverpNoFilter &	
+                             //ckftracks & 
+                               l1IsoElectronsRegionalRecoTracker & //// here the regional is obtained by
+                               l1NonIsoElectronsRegionalRecoTracker & //// here the regional is obtained by
+                                                           /// EgammaHLTRegionalPixelSeedGeneratorProducer
+                               l1IsoElectronTrackIsol & 
+                               l1NonIsoElectronTrackIsol 
+#                             hltL1NonIsoSingleElectronTrackIsolNoFilter &
+                                                      
+#                             singleElectronL1NonIsoPresc
+                            }
+

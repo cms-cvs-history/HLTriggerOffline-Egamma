@@ -1,0 +1,45 @@
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoRecoEcalCandidate.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoPhotonEcalIsol.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsolatedPhotonHcalIsol.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoEgammaRegionalRecoTracker.cff"	
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoPhotonTrackIsol.cff"
+
+
+## include "RecoEgamma/EgammaHLTProducers/data/hltDoublePhotonEcalIsol.cfi"
+## include "RecoEgamma/EgammaHLTProducers/data/hltDoublePhotonHcalIsol.cfi"
+## include "RecoEgamma/EgammaHLTProducers/data/hltDoublePhotonTrackIsol.cfi"
+
+## include "HLTrigger/Egamma/data/hltDoublePhotonEtFilter.cfi"
+## include "HLTrigger/Egamma/data/hltSinglePhotonEcalIsolFilter.cfi"
+## include "HLTrigger/Egamma/data/hltDoublePhotonHcalIsolFilter.cfi"
+## include "HLTrigger/Egamma/data/hltDoublePhotonTrackIsolFilter.cfi"
+
+#--------------------------------------------------------------------#
+# MC ETA CUT
+#--------------------------------------------------------------------#
+include "HLTriggerOffline/Egamma/data/mcDoublePhotonEtaFilter.cfi"
+
+  sequence doublePhotonL1IsolatedNoHLT = {
+                         mcDoublePhotonEtaFilter&
+			  hltBegin&
+	                   #doL1T &
+                           l1seedDouble &
+		           doRegionalEgammaEcal &
+#                           doLocalEcal &
+                           l1IsolatedEcalClusters  &
+                           l1IsoRecoEcalCandidate &
+                           #hltL1IsoDoublePhotonL1MatchFilter &
+#                           hltL1IsoDoublePhotonL1MatchFilterRegional &
+#                           hltL1IsoDoublePhotonEtFilter & 
+	                   l1IsolatedPhotonEcalIsol & 
+#                          hltL1IsoDoublePhotonEcalIsolFilter &
+                           doLocalHcalWithoutHO &
+                           l1IsolatedPhotonHcalIsol & 
+#                          hltL1IsoDoublePhotonHcalIsolFilter &
+                           doLocalTracker &
+                           l1IsoEgammaRegionalRecoTracker &
+                           l1IsoPhotonTrackIsol
+#                          hltL1IsoDoublePhotonTrackIsolFilter &
+#	                   hltL1IsoDoublePhotonDoubleEtFilter &
+#                          doublePhotonL1IsoPresc
+	                  }

@@ -1,0 +1,57 @@
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoRecoEcalCandidate.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsolatedElectronHcalIsol.cff"
+ 
+ include "RecoEgamma/EgammaHLTProducers/data/pixelMatchElectronL1IsoSequenceForHLT.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/pixelMatchElectronL1IsoTrackingSequenceForHLT.cff"
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoElectronsRegionalRecoTracker.cff"
+ 
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoElectronTrackIsol.cff"
+
+
+### include "RecoEgamma/EgammaHLTProducers/data/hltSingleElectronHcalIsol.cfi"
+### include "RecoEgamma/EgammaHLTProducers/data/hltSingleElectronTrackIsol.cfi"
+
+#----------- filter modules for the sequence --------------------------------#
+#--------------------------------------------------------------------#
+# MC ETA CUT
+#--------------------------------------------------------------------#
+include "HLTriggerOffline/Egamma/data/mcDoubleElectronEtaFilter.cfi"
+
+  sequence doubleElectronL1IsolatedNoHLT = { 
+                                mcDoubleElectronEtaFilter&
+	                               hltBegin&
+                        ##              doL1T &
+                                        l1seedDouble &
+		           doRegionalEgammaEcal &
+#                             doLocalEcal & 
+	                     l1IsolatedEcalClusters &
+                             l1IsoRecoEcalCandidate &
+                             #hltL1IsoDoubleElectronL1MatchFilter &
+#			     hltL1IsoDoubleElectronL1MatchFilterRegional &
+#                             hltL1IsoDoubleElectronEtFilter &
+                             doLocalHcalWithoutHO &
+                             l1IsolatedElectronHcalIsol & 
+#                            hltL1IsoDoubleElectronHcalIsolFilter &
+                             ##### trackerlocalreco &              
+  			     doLocalPixel &
+	                     pixelMatchElectronL1IsoSequenceForHLT & 
+#                            hltL1IsoDoubleElectronPixelMatchFilter &
+                             doLocalStrip  & 
+                             pixelMatchElectronL1IsoTrackingSequenceForHLT &
+#                             hltL1IsoDoubleElectronEoverpFilter &	
+                             //ckftracks & 
+                             l1IsoElectronsRegionalRecoTracker & //// here the regional is obtained by
+                                                           /// EgammaHLTRegionalPixelSeedGeneratorProducer
+                             l1IsoElectronTrackIsol
+#                            hltL1IsoDoubleElectronTrackIsolFilter &
+                                                      
+#                             doubleElectronL1IsoPresc
+                            }
+
+
+
+
+
+

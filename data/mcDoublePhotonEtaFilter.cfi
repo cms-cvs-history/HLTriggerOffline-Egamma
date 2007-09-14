@@ -1,0 +1,8 @@
+#                                                                                                                                                                                    
+# apply MC level eta cuts                                                                                                                                                            
+#                                                                                                                                                                                    
+module mcDoublePhotonEtaFilter = MCEtaFilter {
+    InputTag candTag = source
+    int32 ncandcut = 2
+    int32 id = -1
+}

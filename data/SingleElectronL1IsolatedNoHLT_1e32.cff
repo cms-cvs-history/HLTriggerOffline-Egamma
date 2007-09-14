@@ -1,0 +1,51 @@
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoRecoEcalCandidate.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsolatedElectronHcalIsol.cff"
+ 
+ include "RecoEgamma/EgammaHLTProducers/data/pixelMatchElectronL1IsoSequenceForHLT.cff"
+ include "RecoEgamma/EgammaHLTProducers/data/pixelMatchElectronL1IsoTrackingSequenceForHLT.cff"
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoElectronsRegionalRecoTracker.cff"	
+
+ include "RecoEgamma/EgammaHLTProducers/data/l1IsoElectronTrackIsol.cff"
+
+
+### include "RecoEgamma/EgammaHLTProducers/data/hltSingleElectronHcalIsol.cfi"
+### include "RecoEgamma/EgammaHLTProducers/data/hltSingleElectronTrackIsol.cfi"
+
+#----------- filter modules for the sequence --------------------------------#
+#--------------------------------------------------------------------#
+# MC ETA CUT
+#--------------------------------------------------------------------#
+include "HLTriggerOffline/Egamma/data/mcSingleElectronEtaFilter.cfi"
+
+  sequence singleElectronL1IsolatedNoHLT = {
+                         mcSingleElectronEtaFilter&
+	                           hltBegin& 
+                                      ##doL1T &
+                             l1seedSingle &
+		           doRegionalEgammaEcal &
+#	                  doLocalEcal &
+                               l1IsolatedEcalClusters &
+                               l1IsoRecoEcalCandidate &
+#                             hltL1IsoSingleL1MatchNoFilter &
+#                            hltL1IsoSingleElectronEtNoFilter &
+                          doLocalHcalWithoutHO &
+                               l1IsolatedElectronHcalIsol & 
+#                             hltL1IsoSingleElectronHcalIsolNoFilter &
+                             ##### trackerlocalreco &              
+                          doLocalPixel & // pixel rechit for SC-pixel matching
+	                       pixelMatchElectronL1IsoSequenceForHLT & 
+#                             hltL1IsoSingleElectronPixelMatchNoFilter &
+			  doLocalStrip & // strip rechit for the electron tracking
+                               pixelMatchElectronL1IsoTrackingSequenceForHLT &
+#                             hltL1IsoSingleElectronEoverpNoFilter &	
+                             //ckftracks & 
+                               l1IsoElectronsRegionalRecoTracker & //// here the regional is obtained by
+                                                           /// EgammaHLTRegionalPixelSeedGeneratorProducer
+                               l1IsoElectronTrackIsol
+#                             hltL1IsoSingleElectronTrackIsolNoFilter &
+                                                      
+#                             singleElectronL1IsoPresc
+                            }
+

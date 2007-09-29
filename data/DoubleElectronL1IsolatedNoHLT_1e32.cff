@@ -20,7 +20,7 @@
 include "HLTriggerOffline/Egamma/data/mcDoubleElectronEtaFilter.cfi"
 
   sequence doubleElectronL1IsolatedNoHLT = { 
-                                mcDoubleElectronEtaFilter&
+#                                mcDoubleElectronEtaFilter&
 	                               hltBegin&
                         ##              doL1T &
                                         l1seedDouble &

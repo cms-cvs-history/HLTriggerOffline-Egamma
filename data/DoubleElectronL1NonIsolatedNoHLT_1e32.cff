@@ -29,7 +29,7 @@
 include "HLTriggerOffline/Egamma/data/mcDoubleElectronEtaFilter.cfi"
 
   sequence doubleElectronL1NonIsolatedNoHLT = {
-                                        mcDoubleElectronEtaFilter&
+#                                        mcDoubleElectronEtaFilter&
  					hltBegin&
                                        # doL1T &
                                         # was like thisl1seedDouble &

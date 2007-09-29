@@ -27,7 +27,7 @@
 include "HLTriggerOffline/Egamma/data/mcSingleElectronEtaFilter.cfi"
 
   sequence singleElectronL1NonIsolatedNoHLT = {
-                            mcSingleElectronEtaFilter&
+#                            mcSingleElectronEtaFilter&
 	                           hltBegin& 
                                       ##doL1T &
                              l1seedRelaxedSingle &

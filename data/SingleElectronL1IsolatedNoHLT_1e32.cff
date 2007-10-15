@@ -56,8 +56,6 @@ include "HLTriggerOffline/Egamma/data/mcSingleElectronEtaFilter.cfi"
                                l1IsoRecoEcalCandidate &
                              hltL1IsoSingleL1MatchFilter &
                              hltL1IsoSingleElectronEtFilter &
-#                             hltL1IsoSingleL1MatchNoFilter &
-#                            hltL1IsoSingleElectronEtNoFilter &
                           doLocalHcalWithoutHO &
                                l1IsolatedElectronHcalIsol & 
 #                             hltL1IsoSingleElectronHcalIsolNoFilter &

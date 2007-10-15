@@ -46,7 +46,7 @@ module hltL1IsoSinglePhotonEtFilter = hltEgammaEtFilter from "HLTrigger/Egamma/d
 include "HLTriggerOffline/Egamma/data/mcSinglePhotonEtaFilter.cfi"
 
   sequence singlePhotonL1IsolatedNoHLT = {
-                           mcSinglePhotonEtaFilter&
+#                           mcSinglePhotonEtaFilter&
 	                   hltBegin&
                            ##doL1T &
                            l1seedSingle & 

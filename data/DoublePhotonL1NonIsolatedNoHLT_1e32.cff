@@ -59,7 +59,7 @@ replace hltL1NonIsoDoublePhotonEtFilter.ncandcut = 1
 include "HLTriggerOffline/Egamma/data/mcDoublePhotonEtaFilter.cfi"
 
   sequence doublePhotonL1NonIsolatedNoHLT = {
-                           mcDoublePhotonEtaFilter&
+#                           mcDoublePhotonEtaFilter&
 			   hltBegin&
                            #doL1T &
                            l1seedRelaxedDouble

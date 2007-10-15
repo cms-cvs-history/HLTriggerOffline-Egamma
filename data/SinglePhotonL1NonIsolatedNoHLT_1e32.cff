@@ -58,7 +58,7 @@ replace hltL1NonIsoSinglePhotonEtFilter.ncandcut = 1
 include "HLTriggerOffline/Egamma/data/mcSinglePhotonEtaFilter.cfi"
 
   sequence singlePhotonL1NonIsolatedNoHLT = {
-                          mcSinglePhotonEtaFilter&
+#                          mcSinglePhotonEtaFilter&
 	                   hltBegin&
                            ##doL1T &
                            l1seedRelaxedSingle &

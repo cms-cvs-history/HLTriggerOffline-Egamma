@@ -1,0 +1,24 @@
+  module singlePhotonRelaxedDQM = EmDQM  { 
+  uint32 reqNum = 1 
+  int32  pdgGen = 22
+  double genEtaAcc = 2.5
+  double genEtAcc = 2.
+ VInputTag HLTCollectionLabels = {
+	l1seedRelaxedSingle,
+	hltL1NonIsoSinglePhotonL1MatchFilterRegional,
+	hltL1NonIsoSinglePhotonEtFilter,
+	hltL1NonIsoSinglePhotonEcalIsolFilter,
+	hltL1NonIsoSinglePhotonHcalIsolFilter,
+	hltL1NonIsoSinglePhotonTrackIsolFilter
+	}
+ 
+  vint32 theHLTOutputTypes = {   
+	82,
+	100,
+ 	100,
+	100,
+	100,
+	100
+        }
+  untracked double PtMax = 200
+ }

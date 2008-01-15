@@ -1,0 +1,26 @@
+  module singleElectronDQM = EmDQM  { 
+  uint32 reqNum = 1 
+  int32  pdgGen = 11
+  double genEtaAcc = 2.5
+  double genEtAcc = 2.
+ VInputTag HLTCollectionLabels = {
+	l1SeedSingle,
+	hltL1IsoSingleL1MatchFilter,
+	hltL1IsoSingleElectronEtFilter,	
+        hltL1IsoSingleElectronHcalIsolFilter,
+	hltL1IsoSingleElectronPixelMatchFilter,
+	hltL1IsoSingleElectronHOneOEMinusOneOPFilter,
+	hltL1IsoSingleElectronTrackIsolFilter
+	}
+ 
+  vint32 theHLTOutputTypes = {   
+	83,
+	100,
+ 	100,
+	100,
+	100,
+	92,
+	92
+        }
+  untracked double PtMax = 200
+ }

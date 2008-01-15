@@ -1,0 +1,24 @@
+  module singlePhotonDQM = EmDQM  { 
+  uint32 reqNum = 1 
+  int32  pdgGen = 22
+  double genEtaAcc = 2.5
+  double genEtAcc = 2.
+ VInputTag HLTCollectionLabels = {
+	l1seedSingle,
+	hltL1IsoSinglePhotonL1MatchFilter,
+	hltL1IsoSinglePhotonEtFilter,
+	hltL1IsoSinglePhotonEcalIsolFilter,
+	hltL1IsoSinglePhotonHcalIsolFilter,
+	hltL1IsoSinglePhotonTrackIsolFilter
+	}
+ 
+  vint32 theHLTOutputTypes = {   
+	83,
+	100,
+ 	100,
+	100,
+	100,
+	100
+        }
+  untracked double PtMax = 200
+ }

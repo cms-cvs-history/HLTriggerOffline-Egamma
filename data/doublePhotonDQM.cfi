@@ -1,0 +1,26 @@
+  module doublePhotonDQM = EmDQM  { 
+  uint32 reqNum = 2 
+  int32  pdgGen = 22
+  double genEtaAcc = 2.5
+  double genEtAcc = 2.
+ VInputTag HLTCollectionLabels = {
+	l1seedDouble,
+	hltL1IsoDoublePhotonL1MatchFilterRegional,
+	hltL1IsoDoublePhotonEtFilter,
+	hltL1IsoDoublePhotonEcalIsolFilter,
+	hltL1IsoDoublePhotonHcalIsolFilter,
+	hltL1IsoDoublePhotonTrackIsolFilter,
+	hltL1IsoDoublePhotonTrackIsolFilter
+	}
+ 
+  vint32 theHLTOutputTypes = {   
+	83,
+	100,
+ 	100,
+	100,
+	100,
+	100,
+	100
+        }
+  untracked double PtMax = 200
+ }

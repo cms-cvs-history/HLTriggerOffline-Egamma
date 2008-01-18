@@ -4,7 +4,7 @@
   double genEtaAcc = 2.5
   double genEtAcc = 2.
   VInputTag HLTCollectionLabels = {
-	l1SeedRelaxedSingle,
+	l1seedRelaxedSingle,
 	hltL1NonIsoSingleElectronL1MatchFilterRegional,
 	hltL1NonIsoSingleElectronEtFilter,
 	hltL1NonIsoSingleElectronHcalIsolFilter,

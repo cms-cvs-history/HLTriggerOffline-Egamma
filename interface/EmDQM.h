@@ -14,6 +14,7 @@
 #include <vector>
 #include "TDirectory.h"
 #include "TH1F.h"
+#include "HepMC/GenParticle.h"
 
 class EmDQM : public edm::EDAnalyzer{
 public:
@@ -42,6 +43,8 @@ private:
 
   std::vector<TH1F*> etahist;
   std::vector<TH1F*> ethist;
+  std::vector<TH1F*> etahistmatch;
+  std::vector<TH1F*> ethistmatch;
   TH1F* total;
   TH1F* etgen;
   TH1F* etagen;
@@ -49,7 +52,7 @@ private:
   double genEtaAcc;
   double genEtAcc;
 
-  template <class T> void fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& , std::vector<int>& ,int);
+  template <class T> void fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& , std::vector<int>& ,int, std::vector<HepMC::GenParticle>& );
   
 
 };

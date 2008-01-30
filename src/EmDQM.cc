@@ -11,8 +11,7 @@
 #include "DataFormats/L1Trigger/interface/L1EmParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
-
-
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Common/interface/RefToBase.h"
@@ -25,7 +24,8 @@
 #include "TH1F.h"
 #include <iostream>
 #include <string>
-
+#include <Math/VectorUtil.h>
+using namespace ROOT::Math::VectorUtil ;
 
 /// Constructor
 EmDQM::EmDQM(const edm::ParameterSet& pset)  
@@ -68,6 +68,14 @@ void EmDQM::beginJob(const edm::EventSetup&){
     histoname = theHLTCollectionLabels[i].label()+"eta";
     tmphisto =  fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
     etahist.push_back(tmphisto);          
+
+    histoname = theHLTCollectionLabels[i].label()+"et MC matched";
+    tmphisto =  fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
+    ethistmatch.push_back(tmphisto);
+    
+    histoname = theHLTCollectionLabels[i].label()+"eta MC matched";
+    tmphisto =  fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
+    etahistmatch.push_back(tmphisto);          
   } 
 
 }
@@ -86,6 +94,7 @@ void EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup){
   edm::Handle<edm::HepMCProduct> genEvt;
   event.getByLabel("source", genEvt);
   
+  std::vector<HepMC::GenParticle> mcparts;
   const HepMC::GenEvent * myGenEvent = genEvt->GetEvent();
   unsigned int ncand = 0;
   for ( HepMC::GenEvent::particle_const_iterator p = myGenEvent->particles_begin(); p != myGenEvent->particles_end(); ++p ) {
@@ -98,6 +107,7 @@ void EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup){
       ncand++;
       etgen->Fill(Et);
       etagen->Fill(eta);
+      mcparts.push_back(*(*p));
     }
   }//end of loop over MC particles
   if (ncand >= reqNum) total->Fill(theHLTCollectionLabels.size()+1.5);
@@ -112,20 +122,20 @@ void EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup){
   for(unsigned int n=0; n < theHLTCollectionLabels.size() ; n++) { //loop over filter modules
     switch(theHLTOutputTypes[n]){
     case 82: // non-iso L1
-      fillHistos<l1extra::L1EmParticleCollection>(triggerObj,theHLTOutputTypes,n);break;
+      fillHistos<l1extra::L1EmParticleCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
     case 83: // iso L1
-      fillHistos<l1extra::L1EmParticleCollection>(triggerObj,theHLTOutputTypes,n);break;
+      fillHistos<l1extra::L1EmParticleCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
     case 92: //electron 
-      fillHistos<reco::ElectronCollection>(triggerObj,theHLTOutputTypes,n);break;
+      fillHistos<reco::ElectronCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
     case 100: // TriggerCluster
-      fillHistos<reco::RecoEcalCandidateCollection>(triggerObj,theHLTOutputTypes,n);break;
+      fillHistos<reco::RecoEcalCandidateCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
     default: throw(cms::Exception("Release Validation Error")<< "HLT output type not implemented: theHLTOutputTypes[n]" );
     }
   }
 }
 
 
-template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& triggerObj, std::vector<int>&  theHLTOutputTypes,int n){
+template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& triggerObj, std::vector<int>&  theHLTOutputTypes,int n,std::vector<HepMC::GenParticle>& mcparts){
   
   std::vector<edm::Ref<T> > recoecalcands;
   if (!( triggerObj->filterIndex(theHLTCollectionLabels[n].label())>=triggerObj->size() )){ // only process if availabel
@@ -147,8 +157,32 @@ template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithR
       if(recoecalcands.size() >= reqNum ) 
 	total->Fill(n+0.5);
       for (unsigned int i=0; i<recoecalcands.size(); i++) {
+	//unmatched
 	ethist[n]->Fill(recoecalcands[i]->et() );
 	etahist[n]->Fill(recoecalcands[i]->eta() );
+	//matched
+	math::XYZVector candDir=recoecalcands[i]->momentum();
+	std::vector<HepMC::GenParticle>::iterator closest = mcparts.end();
+	double closestDr=1000. ;
+	for(std::vector<HepMC::GenParticle>::iterator mc = mcparts.begin(); mc !=  mcparts.end() ; mc++){
+	  math::XYZVector mcDir( mc->momentum().px(),
+				 mc->momentum().py(),
+				 mc->momentum().pz());	  
+	  double dr = DeltaR(mcDir,candDir);
+	  if(dr < closestDr){
+	    closestDr = dr;
+	    closest = mc;
+	  }
+	}
+	if (closest == mcparts.end())  edm::LogWarning("EmDQM") << "no MC match, may skew efficieny";
+	else{
+	  float eta   =closest->momentum().eta();
+	  float e     =closest->momentum().e();
+	  float theta =2*atan(exp(-eta));
+	  float Et    =e*sin(theta);
+	  ethistmatch[n]->Fill( Et );
+	  etahistmatch[n]->Fill( eta );
+	}
       }
     }
   }

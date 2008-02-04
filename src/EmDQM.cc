@@ -87,6 +87,19 @@ EmDQM::~EmDQM(){
 
 void EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup){
 
+
+
+  // fill L1 and HLT info
+  // get objects possed by each filter
+  edm::Handle<trigger::TriggerEventWithRefs> triggerObj;
+  event.getByLabel("triggerSummaryRAW",triggerObj); 
+  if(!triggerObj.isValid()) { 
+    edm::LogWarning("EmDQM") << "RAW-type HLT results not found, skipping event";
+    return;
+  }
+// throw(cms::Exception("Release Validation Error")<< "RAW-type HLT results not found" );
+
+
   // total event number
   total->Fill(theHLTCollectionLabels.size()+0.5);
 
@@ -113,12 +126,8 @@ void EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup){
   if (ncand >= reqNum) total->Fill(theHLTCollectionLabels.size()+1.5);
 	  
 
-  // fill L1 and HLT info
-  // get objects possed by each filter
-  edm::Handle<trigger::TriggerEventWithRefs> triggerObj;
-  event.getByLabel("triggerSummaryRAW",triggerObj); 
-  if(!triggerObj.isValid()) throw(cms::Exception("Release Validation Error")<< "RAW-type HLT results not found" );
 
+  
   for(unsigned int n=0; n < theHLTCollectionLabels.size() ; n++) { //loop over filter modules
     switch(theHLTOutputTypes[n]){
     case 82: // non-iso L1

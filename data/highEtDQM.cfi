@@ -10,7 +10,7 @@
 	hltL1NonIsoSingleEMHighEtEcalIsolFilter,
 	hltL1NonIsoSingleEMHighEtHOEFilter,
 	hltL1NonIsoSingleEMHighEtHcalDBCFilter,
-	hltL1NonIsoSingleEMHighEtTrackIsolFilter	  
+	hltL1NonIsoSingleEMHighEtTrackIsolFilter
         }
  
   vint32 theHLTOutputTypes = {   
@@ -20,7 +20,7 @@
 	100,
 	100,
 	100,
-	100	  
+	91	  
         }
   untracked double PtMax = 1000
  }

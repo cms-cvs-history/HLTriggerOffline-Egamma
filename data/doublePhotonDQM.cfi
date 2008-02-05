@@ -9,7 +9,6 @@
 	hltL1IsoDoublePhotonEtFilter,
 	hltL1IsoDoublePhotonEcalIsolFilter,
 	hltL1IsoDoublePhotonHcalIsolFilter,
-	hltL1IsoDoublePhotonTrackIsolFilter,
 	hltL1IsoDoublePhotonTrackIsolFilter
 	}
  
@@ -19,8 +18,7 @@
  	100,
 	100,
 	100,
-	100,
-	100
+	91	
         }
   untracked double PtMax = 200
  }

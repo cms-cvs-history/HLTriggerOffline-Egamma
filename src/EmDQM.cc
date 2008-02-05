@@ -8,6 +8,8 @@
 #include "DataFormats/HLTReco/interface/TriggerEventWithRefs.h"
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"
 #include "DataFormats/EgammaCandidates/interface/Electron.h"
+#include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"
+#include "DataFormats/EgammaCandidates/interface/Photon.h"
 #include "DataFormats/L1Trigger/interface/L1EmParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
@@ -134,6 +136,8 @@ void EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup){
       fillHistos<l1extra::L1EmParticleCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
     case 83: // iso L1
       fillHistos<l1extra::L1EmParticleCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
+    case 91: //photon 
+      fillHistos<reco::RecoEcalCandidateCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
     case 92: //electron 
       fillHistos<reco::ElectronCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
     case 100: // TriggerCluster
@@ -160,6 +164,7 @@ template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithR
 	for(unsigned int i=0; i < isocands.size(); i++)
 	  recoecalcands.push_back(isocands[i]);
     }
+
 
     //fill filter objects into histos
     if (recoecalcands.size()!=0){

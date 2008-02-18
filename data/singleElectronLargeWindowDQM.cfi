@@ -1,0 +1,26 @@
+  module singleElectronLargeWindowDQM = EmDQM  { 
+  uint32 reqNum = 1 
+  int32  pdgGen = 11
+  double genEtaAcc = 2.5
+  double genEtAcc = 2.
+ VInputTag HLTCollectionLabels = {
+	l1seedSingle,
+        hltL1IsoLargeWindowSingleL1MatchFilter,
+        hltL1IsoLargeWindowSingleElectronEtFilter,
+        hltL1IsoLargeWindowSingleElectronHcalIsolFilter,
+        hltL1IsoLargeWindowSingleElectronPixelMatchFilter,
+        hltL1IsoLargeWindowSingleElectronHOneOEMinusOneOPFilter,
+        hltL1IsoLargeWindowSingleElectronTrackIsolFilter
+	}
+ 
+  vint32 theHLTOutputTypes = {   
+	83,
+	100,
+ 	100,
+	100,
+	100,
+	92,
+	92
+        }
+  untracked double PtMax = 200
+ }

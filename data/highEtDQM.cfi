@@ -31,7 +31,7 @@
    },
    { InputTag  HLTCollectionLabels = hltL1NonIsoSingleEMHighEtHcalDBCFilter
      uint32    theHLTOutputTypes   = 100
-     VInputTag IsoCollections      = {l1NonIsoEMHcalDoubleCone}//{hltHcalDoubleCone,l1NonIsoEMHcalDoubleCone}
+     VInputTag IsoCollections      = {hltHcalDoubleCone,l1NonIsoEMHcalDoubleCone}
      vdouble   PlotBounds          = {0,200}
    },
    { InputTag  HLTCollectionLabels = hltL1NonIsoSingleEMHighEtTrackIsolFilter

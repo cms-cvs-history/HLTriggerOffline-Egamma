@@ -3,24 +3,43 @@
   int32  pdgGen = 11
   double genEtaAcc = 2.5
   double genEtAcc = 2.
- VInputTag HLTCollectionLabels = {
-	l1seedSingle,
-	hltL1IsoSingleL1MatchFilter,
-	hltL1IsoSingleElectronEtFilter,	
-        hltL1IsoSingleElectronHcalIsolFilter,
-	hltL1IsoSingleElectronPixelMatchFilter,
-	hltL1IsoSingleElectronHOneOEMinusOneOPFilter,
-	hltL1IsoSingleElectronTrackIsolFilter
-	}
- 
-  vint32 theHLTOutputTypes = {   
-	83,
-	100,
- 	100,
-	100,
-	100,
-	92,
-	92
-        }
+  VPSet filters = {
+   { InputTag  HLTCollectionLabels = l1seedSingle
+     uint32    theHLTOutputTypes   = 83
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoSingleL1MatchFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoSingleElectronEtFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoSingleElectronHcalIsolFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {l1IsolatedElectronHcalIsol}
+     vdouble   PlotBounds          = {0,10}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoSingleElectronPixelMatchFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoSingleElectronHOneOEMinusOneOPFilter
+     uint32    theHLTOutputTypes   = 92
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoSingleElectronTrackIsolFilter
+     uint32    theHLTOutputTypes   = 92
+     VInputTag IsoCollections      = {l1IsoElectronTrackIsol}
+     vdouble   PlotBounds          = {0,10}
+   }
+  }
+
   untracked double PtMax = 200
  }

@@ -3,24 +3,43 @@
   int32  pdgGen = 11
   double genEtaAcc = 2.5
   double genEtAcc = 2.
-  VInputTag HLTCollectionLabels = {
-	l1seedRelaxedSingle,   
- 	hltL1NonIsoSingleEMHighEtL1MatchFilterRegional,
-	hltL1NonIsoSinglePhotonEMHighEtEtFilter,
-	hltL1NonIsoSingleEMHighEtEcalIsolFilter,
-	hltL1NonIsoSingleEMHighEtHOEFilter,
-	hltL1NonIsoSingleEMHighEtHcalDBCFilter,
-	hltL1NonIsoSingleEMHighEtTrackIsolFilter
-        }
- 
-  vint32 theHLTOutputTypes = {   
-	82,
- 	100,
-	100,
-	100,
-	100,
-	100,
-	91	  
-        }
+  VPSet filters = {
+   { InputTag  HLTCollectionLabels = l1seedRelaxedSingle
+     uint32    theHLTOutputTypes   = 82
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSingleEMHighEtL1MatchFilterRegional
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonEMHighEtEtFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSingleEMHighEtEcalIsolFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {l1IsolatedPhotonEcalIsol,l1NonIsolatedPhotonEcalIsol}
+     vdouble   PlotBounds          = {0,200}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSingleEMHighEtHOEFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {l1NonIsolatedElectronHcalIsol,l1IsolatedElectronHcalIsol}
+     vdouble   PlotBounds          = {0,200}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSingleEMHighEtHcalDBCFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {l1NonIsoEMHcalDoubleCone}//{hltHcalDoubleCone,l1NonIsoEMHcalDoubleCone}
+     vdouble   PlotBounds          = {0,200}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSingleEMHighEtTrackIsolFilter
+     uint32    theHLTOutputTypes   = 91
+     VInputTag IsoCollections      = {l1IsoPhotonTrackIsol,l1NonIsoPhotonTrackIsol}
+     vdouble   PlotBounds          = {0,10}
+   }
+  }
+
   untracked double PtMax = 1000
  }

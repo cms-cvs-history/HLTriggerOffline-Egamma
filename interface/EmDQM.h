@@ -14,6 +14,7 @@
 #include <vector>
 #include "TDirectory.h"
 #include "TH1F.h"
+#include "TH2F.h"
 #include "HepMC/GenParticle.h"
 
 class EmDQM : public edm::EDAnalyzer{
@@ -35,6 +36,9 @@ private:
   std::vector<edm::InputTag> theHLTCollectionLabels;  
   edm::InputTag theL1Seed;
   std::vector<int> theHLTOutputTypes;
+  std::vector<bool> plotiso;
+  std::vector<std::vector<edm::InputTag> > isoNames; // there has to be a better solution
+  std::vector<std::pair<double,double> > plotBounds; 
   std::string theHltName;
   unsigned int reqNum;
   double thePtMin ;
@@ -45,6 +49,8 @@ private:
   std::vector<TH1F*> ethist;
   std::vector<TH1F*> etahistmatch;
   std::vector<TH1F*> ethistmatch;
+  std::vector<TH2F*> etahistiso;
+  std::vector<TH2F*> ethistiso;
   TH1F* total;
   TH1F* etgen;
   TH1F* etagen;
@@ -52,7 +58,7 @@ private:
   double genEtaAcc;
   double genEtAcc;
 
-  template <class T> void fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& , std::vector<int>& ,int, std::vector<HepMC::GenParticle>& );
+  template <class T> void fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& ,const edm::Event& ,unsigned int, std::vector<HepMC::GenParticle>& );
   
 
 };

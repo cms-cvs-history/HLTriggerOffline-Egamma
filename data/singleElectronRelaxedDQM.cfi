@@ -3,24 +3,43 @@
   int32  pdgGen = 11
   double genEtaAcc = 2.5
   double genEtAcc = 2.
-  VInputTag HLTCollectionLabels = {
-	l1seedRelaxedSingle,
-	hltL1NonIsoSingleElectronL1MatchFilterRegional,
-	hltL1NonIsoSingleElectronEtFilter,
-	hltL1NonIsoSingleElectronHcalIsolFilter,
-	hltL1NonIsoSingleElectronPixelMatchFilter,
-	hltL1NonIsoSingleElectronHOneOEMinusOneOPFilter,
-	hltL1NonIsoSingleElectronTrackIsolFilter
-	}
- 
-  vint32 theHLTOutputTypes = {   
-	82,
-	100,
- 	100,
-	100,
-	100,
-	92,
-	92
-        }
+  VPSet filters = {
+   { InputTag  HLTCollectionLabels = l1seedRelaxedSingle
+     uint32    theHLTOutputTypes   = 82
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSingleElectronL1MatchFilterRegional
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSingleElectronEtFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSingleElectronHcalIsolFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {l1IsolatedElectronHcalIsol,l1NonIsolatedElectronHcalIsol}
+     vdouble   PlotBounds          = {0,10}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSingleElectronPixelMatchFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSingleElectronHOneOEMinusOneOPFilter
+     uint32    theHLTOutputTypes   = 92
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSingleElectronTrackIsolFilter
+     uint32    theHLTOutputTypes   = 92
+     VInputTag IsoCollections     = {l1IsoElectronTrackIsol,l1NonIsoElectronTrackIsol}
+     vdouble   PlotBounds          = {0,10}
+   }
+  }
+
   untracked double PtMax = 200
  }

@@ -3,24 +3,43 @@
   int32  pdgGen = 11
   double genEtaAcc = 2.5
   double genEtAcc = 2.
- VInputTag HLTCollectionLabels = {
-	l1seedDouble,
-	hltL1IsoDoubleElectronL1MatchFilterRegional,
-	hltL1IsoDoubleElectronEtFilter,
-	hltL1IsoDoubleElectronHcalIsolFilter,
-	hltL1IsoDoubleElectronPixelMatchFilter,
-	hltL1IsoDoubleElectronEoverpFilter,
-	hltL1IsoDoubleElectronTrackIsolFilter
-	}
- 
-  vint32 theHLTOutputTypes = {   
-	83,
-	100,
- 	100,
-	100,
-	100,
-	92,
-	92
-        }
+  VPSet filters = {
+   { InputTag  HLTCollectionLabels = l1seedDouble
+     uint32    theHLTOutputTypes   = 83
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoDoubleElectronL1MatchFilterRegional 
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoDoubleElectronEtFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoDoubleElectronHcalIsolFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {l1IsolatedElectronHcalIsol}
+     vdouble   PlotBounds          = {0,10}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoDoubleElectronPixelMatchFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoDoubleElectronEoverpFilter
+     uint32    theHLTOutputTypes   = 92
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoDoubleElectronTrackIsolFilter
+     uint32    theHLTOutputTypes   = 92
+     VInputTag IsoCollections      = {l1IsoElectronTrackIsol}
+     vdouble   PlotBounds          = {0,10}
+   }
+  }
+
   untracked double PtMax = 200
  }

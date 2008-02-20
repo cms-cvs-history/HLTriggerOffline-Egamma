@@ -3,22 +3,38 @@
   int32  pdgGen = 22
   double genEtaAcc = 2.5
   double genEtAcc = 2.
- VInputTag HLTCollectionLabels = {
-	l1seedDouble,
-	hltL1IsoDoublePhotonL1MatchFilterRegional,
-	hltL1IsoDoublePhotonEtFilter,
-	hltL1IsoDoublePhotonEcalIsolFilter,
-	hltL1IsoDoublePhotonHcalIsolFilter,
-	hltL1IsoDoublePhotonTrackIsolFilter
-	}
- 
-  vint32 theHLTOutputTypes = {   
-	83,
-	100,
- 	100,
-	100,
-	100,
-	91	
-        }
+  VPSet filters = {
+   { InputTag  HLTCollectionLabels = l1seedDouble
+     uint32    theHLTOutputTypes   = 83
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoDoublePhotonL1MatchFilterRegional
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoDoublePhotonEtFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoDoublePhotonEcalIsolFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {l1IsolatedPhotonEcalIsol}
+     vdouble   PlotBounds          = {0,10}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoDoublePhotonHcalIsolFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {l1IsolatedPhotonHcalIsol}
+     vdouble   PlotBounds          = {0,10}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoDoublePhotonTrackIsolFilter
+     uint32    theHLTOutputTypes   = 91
+     VInputTag IsoCollections      = {l1IsoPhotonTrackIsol}
+     vdouble   PlotBounds          = {0,10}
+   }
+  }
+
   untracked double PtMax = 200
  }

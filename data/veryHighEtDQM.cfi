@@ -3,16 +3,24 @@ module veryHighEtDQM =  EmDQM  {
   int32  pdgGen = 11
   double genEtaAcc = 2.5
   double genEtAcc = 2.
-  VInputTag HLTCollectionLabels = {
-	l1seedRelaxedSingle,   
-	hltL1NonIsoSingleEMVeryHighEtL1MatchFilterRegional,
-	hltL1NonIsoSinglePhotonEMVeryHighEtEtFilter	
-        }
- 
-  vint32 theHLTOutputTypes = {   
-	82,
- 	100,
-	100
-        }
+
+  VPSet filters = {
+   { InputTag HLTCollectionLabels  = l1seedRelaxedSingle
+     uint32   theHLTOutputTypes    = 82
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag HLTCollectionLabels  = hltL1NonIsoSingleEMVeryHighEtL1MatchFilterRegional
+     uint32   theHLTOutputTypes    = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag HLTCollectionLabels  = hltL1NonIsoSinglePhotonEMVeryHighEtEtFilter
+     uint32   theHLTOutputTypes    = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   }
+ }
+
   untracked double PtMax = 4000
  }

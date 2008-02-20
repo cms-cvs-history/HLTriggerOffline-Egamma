@@ -3,24 +3,43 @@
   int32  pdgGen = 11
   double genEtaAcc = 2.5
   double genEtAcc = 2.
- VInputTag HLTCollectionLabels = {
-	l1seedSingle,
-        hltL1IsoLargeWindowSingleL1MatchFilter,
-        hltL1IsoLargeWindowSingleElectronEtFilter,
-        hltL1IsoLargeWindowSingleElectronHcalIsolFilter,
-        hltL1IsoLargeWindowSingleElectronPixelMatchFilter,
-        hltL1IsoLargeWindowSingleElectronHOneOEMinusOneOPFilter,
-        hltL1IsoLargeWindowSingleElectronTrackIsolFilter
-	}
- 
-  vint32 theHLTOutputTypes = {   
-	83,
-	100,
- 	100,
-	100,
-	100,
-	92,
-	92
-        }
+  VPSet filters = {
+   { InputTag  HLTCollectionLabels = l1seedSingle
+     uint32    theHLTOutputTypes   = 83
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoLargeWindowSingleL1MatchFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoLargeWindowSingleElectronEtFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoLargeWindowSingleElectronHcalIsolFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {l1IsolatedElectronHcalIsol}
+     vdouble   PlotBounds          = {0,10}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoLargeWindowSingleElectronPixelMatchFilter
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoLargeWindowSingleElectronHOneOEMinusOneOPFilter
+     uint32    theHLTOutputTypes   = 92
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1IsoLargeWindowSingleElectronTrackIsolFilter
+     uint32    theHLTOutputTypes   = 92
+     VInputTag IsoCollections      = {l1IsoLargeWindowElectronTrackIsol}
+     vdouble   PlotBounds          = {0,10}
+   }
+  }
+
   untracked double PtMax = 200
  }

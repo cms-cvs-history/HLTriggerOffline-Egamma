@@ -2,7 +2,6 @@
 
 // Collaborating Class Header
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "DataFormats/HLTReco/interface/TriggerEventWithRefs.h"
@@ -14,6 +13,7 @@
 #include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "DataFormats/Common/interface/AssociationMap.h"
 
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Common/interface/RefToBase.h"
@@ -32,17 +32,37 @@ using namespace ROOT::Math::VectorUtil ;
 /// Constructor
 EmDQM::EmDQM(const edm::ParameterSet& pset)  
 {
-  theHLTCollectionLabels = pset.getParameter<std::vector<edm::InputTag> >("HLTCollectionLabels");
-  theHLTOutputTypes = pset.getParameter<std::vector<int> >("theHLTOutputTypes");
+
+  //paramters for generator study
   reqNum = pset.getParameter<unsigned int>("reqNum");
   pdgGen =  pset.getParameter<int>("pdgGen");
   genEtaAcc = pset.getParameter<double>("genEtaAcc");
   genEtAcc = pset.getParameter<double>("genEtAcc");
+  //plotting paramters
   thePtMin = pset.getUntrackedParameter<double>("PtMin",0.);
   thePtMax = pset.getUntrackedParameter<double>("PtMax",1000.);
   theNbins = pset.getUntrackedParameter<unsigned int>("Nbins",40);
   
-  assert (theHLTCollectionLabels.size()==theHLTOutputTypes.size());
+  //info for each filter-step
+  std::vector<edm::ParameterSet> filters = pset.getParameter<std::vector<edm::ParameterSet> >("filters");
+
+  for(std::vector<edm::ParameterSet>::iterator filterconf = filters.begin() ; filterconf != filters.end() ; filterconf++){
+    theHLTCollectionLabels.push_back(filterconf->getParameter<edm::InputTag>("HLTCollectionLabels"));
+    theHLTOutputTypes.push_back(filterconf->getParameter<unsigned int>("theHLTOutputTypes"));
+    std::vector<double> bounds = filterconf->getParameter<std::vector<double> >("PlotBounds");
+    assert(bounds.size() == 2);
+    plotBounds.push_back(std::pair<double,double>(bounds[0],bounds[1]));
+    isoNames.push_back(filterconf->getParameter<std::vector<edm::InputTag> >("IsoCollections"));
+    assert(isoNames.back().size()>0);
+    if (isoNames.back().at(0).label()=="none")
+      plotiso.push_back(false);
+    else{
+       plotiso.push_back(true);
+       //std::cout << "plotting isolation for: " <<  isoNames.back().at(0).label() << std::endl;
+    }
+
+
+  }
 }
 
 
@@ -56,12 +76,13 @@ void EmDQM::beginJob(const edm::EventSetup&){
   for (unsigned int u=0; u<theHLTCollectionLabels.size(); u++){total->GetXaxis()->SetBinLabel(u+1,theHLTCollectionLabels[u].label().c_str());}
 
   TH1F* tmphisto;
-  
+  TH2F* tmpiso;
+
   histoname = "gen et";
   etgen =  fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
   histoname = "gen eta";
   etagen = fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
-  
+ 
   for(unsigned int i = 0; i< theHLTCollectionLabels.size() ; i++){
     histoname = theHLTCollectionLabels[i].label()+"et";
     tmphisto =  fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
@@ -78,8 +99,26 @@ void EmDQM::beginJob(const edm::EventSetup&){
     histoname = theHLTCollectionLabels[i].label()+"eta MC matched";
     tmphisto =  fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
     etahistmatch.push_back(tmphisto);          
-  } 
+    
+    if(plotiso[i]){
+      histoname = theHLTCollectionLabels[i].label()+"eta isolation";
+      tmpiso = fs->make<TH2F>(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7,theNbins,plotBounds[i].first,plotBounds[i].second);
+    }
+    else{
+      tmpiso = NULL;
+    }
+    etahistiso.push_back(tmpiso);
 
+    if(plotiso[i]){
+      histoname = theHLTCollectionLabels[i].label()+"et isolation";
+      tmpiso = fs->make<TH2F>(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax,theNbins,plotBounds[i].first,plotBounds[i].second);
+    }
+    else{
+      tmpiso = NULL;
+    }
+    ethistiso.push_back(tmpiso);
+
+  }
 }
 
 
@@ -133,22 +172,21 @@ void EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup){
   for(unsigned int n=0; n < theHLTCollectionLabels.size() ; n++) { //loop over filter modules
     switch(theHLTOutputTypes[n]){
     case 82: // non-iso L1
-      fillHistos<l1extra::L1EmParticleCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
+      fillHistos<l1extra::L1EmParticleCollection>(triggerObj,event,n,mcparts);break;
     case 83: // iso L1
-      fillHistos<l1extra::L1EmParticleCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
+      fillHistos<l1extra::L1EmParticleCollection>(triggerObj,event,n,mcparts);break;
     case 91: //photon 
-      fillHistos<reco::RecoEcalCandidateCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
+      fillHistos<reco::RecoEcalCandidateCollection>(triggerObj,event,n,mcparts);break;
     case 92: //electron 
-      fillHistos<reco::ElectronCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
+      fillHistos<reco::ElectronCollection>(triggerObj,event,n,mcparts);break;
     case 100: // TriggerCluster
-      fillHistos<reco::RecoEcalCandidateCollection>(triggerObj,theHLTOutputTypes,n,mcparts);break;
+      fillHistos<reco::RecoEcalCandidateCollection>(triggerObj,event,n,mcparts);break;
     default: throw(cms::Exception("Release Validation Error")<< "HLT output type not implemented: theHLTOutputTypes[n]" );
     }
   }
 }
 
-
-template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& triggerObj, std::vector<int>&  theHLTOutputTypes,int n,std::vector<HepMC::GenParticle>& mcparts){
+template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& triggerObj,const edm::Event& iEvent ,unsigned int n,std::vector<HepMC::GenParticle>& mcparts){
   
   std::vector<edm::Ref<T> > recoecalcands;
   if (!( triggerObj->filterIndex(theHLTCollectionLabels[n].label())>=triggerObj->size() )){ // only process if availabel
@@ -197,11 +235,26 @@ template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithR
 	  ethistmatch[n]->Fill( Et );
 	  etahistmatch[n]->Fill( eta );
 	}
+	
+	//plot isolation variables (show not yet cut  iso, i.e. associated to next filter)
+	if(n+1 < theHLTCollectionLabels.size()){ // can't plot beyond last
+	  if(plotiso[n+1]){
+	    for(unsigned int j =  0 ; j < isoNames[n+1].size() ;j++  ){
+	      edm::Handle<edm::AssociationMap<edm::OneToValue< T , float > > > depMap; 
+	      iEvent.getByLabel(isoNames[n+1].at(j).label(),depMap);
+	      typename edm::AssociationMap<edm::OneToValue< T , float > >::const_iterator mapi = depMap->find(recoecalcands[i]);
+	      if(mapi!=depMap->end()){  // found candidate in isolation map! 
+		etahistiso[n+1]->Fill(recoecalcands[i]->eta(),mapi->val);
+		ethistiso[n+1]->Fill(recoecalcands[i]->et(),mapi->val);
+		break; // to avoid multiple filling we only look until we found the candidate once.
+	      }
+	    }
+	  }
+	}
       }
     }
   }
 }
-
 
 void EmDQM::endJob(){
   //  total->Scale(1./total->GetBinContent(1));

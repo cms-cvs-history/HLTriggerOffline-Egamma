@@ -5,11 +5,11 @@
   double genEtAcc = 2.
   VPSet filters = {
    { InputTag  HLTCollectionLabels = l1seedRelaxedSingle
-     uint32    theHLTOutputTypes   = 83
+     uint32    theHLTOutputTypes   = 82
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}
-   },
-   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleL1MatchFilterRegional
+   },                                
+   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronL1MatchFilterRegional
      uint32    theHLTOutputTypes   = 100
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}

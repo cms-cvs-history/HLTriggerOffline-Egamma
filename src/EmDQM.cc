@@ -238,15 +238,17 @@ template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithR
 	
 	//plot isolation variables (show not yet cut  iso, i.e. associated to next filter)
 	if(n+1 < theHLTCollectionLabels.size()){ // can't plot beyond last
-	  if(plotiso[n+1]){
+	  if(plotiso[n+1] ){
 	    for(unsigned int j =  0 ; j < isoNames[n+1].size() ;j++  ){
 	      edm::Handle<edm::AssociationMap<edm::OneToValue< T , float > > > depMap; 
-	      iEvent.getByLabel(isoNames[n+1].at(j).label(),depMap);
-	      typename edm::AssociationMap<edm::OneToValue< T , float > >::const_iterator mapi = depMap->find(recoecalcands[i]);
-	      if(mapi!=depMap->end()){  // found candidate in isolation map! 
-		etahistiso[n+1]->Fill(recoecalcands[i]->eta(),mapi->val);
+	      if(depMap.isValid()){ //Map may not exist if only one candidate apsses a double filter
+		iEvent.getByLabel(isoNames[n+1].at(j).label(),depMap);
+		typename edm::AssociationMap<edm::OneToValue< T , float > >::const_iterator mapi = depMap->find(recoecalcands[i]);
+		if(mapi!=depMap->end()){  // found candidate in isolation map! 
+		  etahistiso[n+1]->Fill(recoecalcands[i]->eta(),mapi->val);
 		ethistiso[n+1]->Fill(recoecalcands[i]->et(),mapi->val);
 		break; // to avoid multiple filling we only look until we found the candidate once.
+		}
 	      }
 	    }
 	  }

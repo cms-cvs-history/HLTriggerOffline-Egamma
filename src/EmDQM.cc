@@ -133,7 +133,7 @@ void EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup){
   // fill L1 and HLT info
   // get objects possed by each filter
   edm::Handle<trigger::TriggerEventWithRefs> triggerObj;
-  event.getByLabel("triggerSummaryRAW",triggerObj); 
+  event.getByLabel("hltTriggerSummaryRAW",triggerObj); 
   if(!triggerObj.isValid()) { 
     edm::LogWarning("EmDQM") << "RAW-type HLT results not found, skipping event";
     return;

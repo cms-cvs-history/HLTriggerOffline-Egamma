@@ -141,6 +141,11 @@ void EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup){
 // throw(cms::Exception("Release Validation Error")<< "RAW-type HLT results not found" );
 
 
+
+//  for(int i = 0; i<triggerObj->size() ;i++ ){
+//    std::cout << triggerObj->filterTag(i) << std::endl;
+//  }
+
   // total event number
   total->Fill(theHLTCollectionLabels.size()+0.5);
 
@@ -189,15 +194,15 @@ void EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup){
 template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& triggerObj,const edm::Event& iEvent ,unsigned int n,std::vector<HepMC::GenParticle>& mcparts){
   
   std::vector<edm::Ref<T> > recoecalcands;
-  if (!( triggerObj->filterIndex(theHLTCollectionLabels[n].label())>=triggerObj->size() )){ // only process if availabel
+  if (!( triggerObj->filterIndex(theHLTCollectionLabels[n])>=triggerObj->size() )){ // only process if availabel
   
     // retrieve saved filter objects
-    triggerObj->getObjects(triggerObj->filterIndex(theHLTCollectionLabels[n].label()),theHLTOutputTypes[n],recoecalcands);
+    triggerObj->getObjects(triggerObj->filterIndex(theHLTCollectionLabels[n]),theHLTOutputTypes[n],recoecalcands);
     //Danger: special case, L1 non-isolated
     // needs to be merged with L1 iso
     if(theHLTOutputTypes[n]==82){
       std::vector<edm::Ref<T> > isocands;
-      triggerObj->getObjects(triggerObj->filterIndex(theHLTCollectionLabels[n].label()),83,isocands);
+      triggerObj->getObjects(triggerObj->filterIndex(theHLTCollectionLabels[n]),83,isocands);
       if(isocands.size()>0)
 	for(unsigned int i=0; i < isocands.size(); i++)
 	  recoecalcands.push_back(isocands[i]);

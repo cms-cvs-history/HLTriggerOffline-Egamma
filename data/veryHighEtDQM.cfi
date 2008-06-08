@@ -5,17 +5,17 @@ module veryHighEtDQM =  EmDQM  {
   double genEtAcc = 2.
 
   VPSet filters = {
-   { InputTag HLTCollectionLabels  = l1seedRelaxedSingle
+   { InputTag HLTCollectionLabels  = hltL1seedRelaxedSingle::HLT
      uint32   theHLTOutputTypes    = 82
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}
    },
-   { InputTag HLTCollectionLabels  = hltL1NonIsoSingleEMVeryHighEtL1MatchFilterRegional
+   { InputTag HLTCollectionLabels  = hltL1NonIsoSingleEMVeryHighEtL1MatchFilterRegional::HLT
      uint32   theHLTOutputTypes    = 100
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}
    },
-   { InputTag HLTCollectionLabels  = hltL1NonIsoSinglePhotonEMVeryHighEtEtFilter
+   { InputTag HLTCollectionLabels  = hltL1NonIsoSinglePhotonEMVeryHighEtEtFilter::HLT
      uint32   theHLTOutputTypes    = 100
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}

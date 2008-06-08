@@ -4,40 +4,40 @@
   double genEtaAcc = 2.5
   double genEtAcc = 2.
   VPSet filters = {
-   { InputTag  HLTCollectionLabels = l1seedRelaxedSingle
+   { InputTag  HLTCollectionLabels = hltL1seedRelaxedSingle::HLT
      uint32    theHLTOutputTypes   = 82
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}
    },                                
-   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronL1MatchFilterRegional
+   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronL1MatchFilterRegional::HLT
      uint32    theHLTOutputTypes   = 100
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}
    },
-   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronEtFilter
+   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronEtFilter::HLT
      uint32    theHLTOutputTypes   = 100
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}
    },
-   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronHcalIsolFilter
+   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronHcalIsolFilter::HLT
      uint32    theHLTOutputTypes   = 100
-     VInputTag IsoCollections      = {l1IsolatedElectronHcalIsol,l1NonIsolatedElectronHcalIsol}
+     VInputTag IsoCollections      = {l1IsolatedElectronHcalIsol::HLT,l1NonIsolatedElectronHcalIsol::HLT}
      vdouble   PlotBounds          = {0,10}
    },
-   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronPixelMatchFilter
+   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronPixelMatchFilter::HLT
      uint32    theHLTOutputTypes   = 100
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}
    },
 
-   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronHOneOEMinusOneOPFilter
+   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronHOneOEMinusOneOPFilter::HLT
      uint32    theHLTOutputTypes   = 92
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}
    },
-   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronTrackIsolFilter
+   { InputTag  HLTCollectionLabels = hltL1NonIsoLargeWindowSingleElectronTrackIsolFilter::HLT
      uint32    theHLTOutputTypes   = 92
-     VInputTag IsoCollections      = {l1IsoLargeWindowElectronTrackIsol,l1NonIsoLargeWindowElectronTrackIsol}
+     VInputTag IsoCollections      = {l1IsoLargeWindowElectronTrackIsol::HLT,l1NonIsoLargeWindowElectronTrackIsol::HLT}
      vdouble   PlotBounds          = {0,10}
    }
   }

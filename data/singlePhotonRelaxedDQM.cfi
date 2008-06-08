@@ -4,34 +4,34 @@
   double genEtaAcc = 2.5
   double genEtAcc = 2.
   VPSet filters = {
-   { InputTag  HLTCollectionLabels = l1seedRelaxedSingle
+   { InputTag  HLTCollectionLabels = hltL1seedRelaxedSingle::HLT
      uint32    theHLTOutputTypes   = 82
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}
    },
-   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonL1MatchFilterRegional
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonL1MatchFilterRegional::HLT
      uint32    theHLTOutputTypes   = 100
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}
    },
-   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonEtFilter
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonEtFilter::HLT
      uint32    theHLTOutputTypes   = 100
      VInputTag IsoCollections      = {none}
      vdouble   PlotBounds          = {0,0}
    },
-   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonEcalIsolFilter
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonEcalIsolFilter::HLT
      uint32    theHLTOutputTypes   = 100
-     VInputTag IsoCollections      = {l1IsolatedPhotonEcalIsol,l1NonIsolatedPhotonEcalIsol}
+     VInputTag IsoCollections      = {l1IsolatedPhotonEcalIsol::HLT,l1NonIsolatedPhotonEcalIsol::HLT}
      vdouble   PlotBounds          = {0,10}
    },
-   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonHcalIsolFilter
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonHcalIsolFilter::HLT
      uint32    theHLTOutputTypes   = 100
-     VInputTag IsoCollections      = {l1IsolatedPhotonHcalIsol,l1NonIsolatedPhotonHcalIsol}
+     VInputTag IsoCollections      = {l1IsolatedPhotonHcalIsol::HLT,l1NonIsolatedPhotonHcalIsol::HLT}
      vdouble   PlotBounds          = {0,10}
    },
-   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonTrackIsolFilter
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonTrackIsolFilter::HLT
      uint32    theHLTOutputTypes   = 91
-     VInputTag IsoCollections      = {l1IsoPhotonTrackIsol,l1NonIsoPhotonTrackIsol}
+     VInputTag IsoCollections      = {l1IsoPhotonTrackIsol::HLT,l1NonIsoPhotonTrackIsol::HLT}
      vdouble   PlotBounds          = {0,10}
    }
   }

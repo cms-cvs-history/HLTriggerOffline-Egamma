@@ -19,8 +19,8 @@ void drawall(char* f1, char* f2 ,char* label1, char* label2, char* var , string 
 
   char* name1=0, *name2=0;
 
-  const int npaths = 12;
-  string paths[npaths]={"singleElectron","singleElectronRelaxed","singleElectronLargeWindow","singleElectronRelaxedLargeWindow","doubleElectron","doubleElectronRelaxed","highEt","veryHighEt","singlePhoton","singlePhotonRelaxed","doublePhoton","doublePhotonRelaxed"};
+  const int npaths = 3;
+  string paths[npaths]={"singleElectron","singleElectronRelaxed","singleElectronLargeWindow"};
   string Histo_paths[npaths];
   for(int i=0;i<npaths;i++){Histo_paths[i]=paths[i]+"DQM/total eff";}
 
@@ -53,17 +53,17 @@ void drawall(char* f1, char* f2 ,char* label1, char* label2, char* var , string 
 
       //*********************************************************
       // DANGER: terrible clutch for differing filter names in 200 and 183
-      if(!strcmp(name1,"hltL1seedSingle")){
-	denomname = paths[path] + "DQM/"+ "l1seedSingle" + var;
+      if(!strcmp(name2,"hltL1seedSingle")){
+	denomname = paths[path] + "DQM/"+ "hltL1seedSingleEgamma" + var;
       }
-      if(!strcmp(name1,"hltL1seedRelaxedSingle")){
-	denomname = paths[path] + "DQM/"+ "l1seedRelaxedSingle" + var;
+      if(!strcmp(name2,"hltL1seedRelaxedSingle")){
+	denomname = paths[path] + "DQM/"+ "hltL1seedRelaxedSingleEgamma" + var;
       }
-      if(!strcmp(name1,"hltL1seedDouble")){
-	denomname = paths[path] + "DQM/"+ "l1seedDouble" + var;
+      if(!strcmp(name2,"hltL1seedDouble")){
+	denomname = paths[path] + "DQM/"+ "hltL1seedDoubleEgamma" + var;
       }
-      if(!strcmp(name1,"hltL1seedRelaxedDouble")){
-	denomname = paths[path] + "DQM/"+ "l1seedRelaxedDouble" + var;
+      if(!strcmp(name2,"hltL1seedRelaxedDouble")){
+	denomname = paths[path] + "DQM/"+ "hltL1seedRelaxedDoubleEgamma" + var;
       }
       // ********************************************************
       denom2 =  new TH1F( *(TH1F*)file2->Get(denomname.c_str() ));

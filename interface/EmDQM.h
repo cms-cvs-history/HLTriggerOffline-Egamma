@@ -11,10 +11,10 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
 #include "DataFormats/Common/interface/RefToBase.h"
+#include "DQMServices/Core/interface/DQMStore.h"
+#include "DQMServices/Core/interface/MonitorElement.h"
 #include <vector>
 #include "TDirectory.h"
-#include "TH1F.h"
-#include "TH2F.h"
 #include "HepMC/GenParticle.h"
 
 class EmDQM : public edm::EDAnalyzer{
@@ -45,21 +45,23 @@ private:
   double thePtMax ;
   unsigned int theNbins ;
 
-  std::vector<TH1F*> etahist;
-  std::vector<TH1F*> ethist;
-  std::vector<TH1F*> etahistmatch;
-  std::vector<TH1F*> ethistmatch;
-  std::vector<TH2F*> etahistiso;
-  std::vector<TH2F*> ethistiso;
-  TH1F* total;
-  TH1F* etgen;
-  TH1F* etagen;
+  std::vector<MonitorElement*> etahist;
+  std::vector<MonitorElement*> ethist;
+  std::vector<MonitorElement*> etahistmatch;
+  std::vector<MonitorElement*> ethistmatch;
+  std::vector<MonitorElement*> etahistiso;
+  std::vector<MonitorElement*> ethistiso;
+  MonitorElement* total;
+  MonitorElement* etgen;
+  MonitorElement* etagen;
   int   pdgGen;
   double genEtaAcc;
   double genEtAcc;
 
   template <class T> void fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& ,const edm::Event& ,unsigned int, std::vector<HepMC::GenParticle>& );
   
+  DQMStore * dbe;
+  std::string dirname_;
 
 };
 #endif

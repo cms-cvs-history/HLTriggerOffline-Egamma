@@ -33,6 +33,12 @@ using namespace ROOT::Math::VectorUtil ;
 EmDQM::EmDQM(const edm::ParameterSet& pset)  
 {
 
+  dbe = edm::Service < DQMStore > ().operator->();
+  dbe->setVerbose(0);
+
+  dirname_="HLT/HLTEgammaValidation/"+pset.getParameter<std::string>("@module_label");
+  dbe->setCurrentFolder(dirname_);
+
   //paramters for generator study
   reqNum = pset.getParameter<unsigned int>("reqNum");
   pdgGen =  pset.getParameter<int>("pdgGen");
@@ -67,42 +73,44 @@ EmDQM::EmDQM(const edm::ParameterSet& pset)
 
 
 void EmDQM::beginJob(const edm::EventSetup&){
-  edm::Service<TFileService> fs;
+  //edm::Service<TFileService> fs;
+  dbe->setCurrentFolder(dirname_);
+  
   std::string histoname="total eff";
 
-  total = fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theHLTCollectionLabels.size()+2,0,theHLTCollectionLabels.size()+2);
-  total->GetXaxis()->SetBinLabel(theHLTCollectionLabels.size()+1,"Total");
-  total->GetXaxis()->SetBinLabel(theHLTCollectionLabels.size()+2,"Gen");
-  for (unsigned int u=0; u<theHLTCollectionLabels.size(); u++){total->GetXaxis()->SetBinLabel(u+1,theHLTCollectionLabels[u].label().c_str());}
+  total = dbe->book1D(histoname.c_str(),histoname.c_str(),theHLTCollectionLabels.size()+2,0,theHLTCollectionLabels.size()+2);
+  total->setBinLabel(theHLTCollectionLabels.size()+1,"Total");
+  total->setBinLabel(theHLTCollectionLabels.size()+2,"Gen");
+  for (unsigned int u=0; u<theHLTCollectionLabels.size(); u++){total->setBinLabel(u+1,theHLTCollectionLabels[u].label().c_str());}
 
-  TH1F* tmphisto;
-  TH2F* tmpiso;
+  MonitorElement* tmphisto;
+  MonitorElement* tmpiso;
 
   histoname = "gen et";
-  etgen =  fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
+  etgen =  dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
   histoname = "gen eta";
-  etagen = fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
+  etagen = dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
  
   for(unsigned int i = 0; i< theHLTCollectionLabels.size() ; i++){
     histoname = theHLTCollectionLabels[i].label()+"et";
-    tmphisto =  fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
+    tmphisto =  dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
     ethist.push_back(tmphisto);
     
     histoname = theHLTCollectionLabels[i].label()+"eta";
-    tmphisto =  fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
+    tmphisto =  dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
     etahist.push_back(tmphisto);          
 
     histoname = theHLTCollectionLabels[i].label()+"et MC matched";
-    tmphisto =  fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
+    tmphisto =  dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
     ethistmatch.push_back(tmphisto);
     
     histoname = theHLTCollectionLabels[i].label()+"eta MC matched";
-    tmphisto =  fs->make<TH1F>(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
+    tmphisto =  dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
     etahistmatch.push_back(tmphisto);          
     
     if(plotiso[i]){
       histoname = theHLTCollectionLabels[i].label()+"eta isolation";
-      tmpiso = fs->make<TH2F>(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7,theNbins,plotBounds[i].first,plotBounds[i].second);
+      tmpiso = dbe->book2D(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7,theNbins,plotBounds[i].first,plotBounds[i].second);
     }
     else{
       tmpiso = NULL;
@@ -111,7 +119,7 @@ void EmDQM::beginJob(const edm::EventSetup&){
 
     if(plotiso[i]){
       histoname = theHLTCollectionLabels[i].label()+"et isolation";
-      tmpiso = fs->make<TH2F>(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax,theNbins,plotBounds[i].first,plotBounds[i].second);
+      tmpiso = dbe->book2D(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax,theNbins,plotBounds[i].first,plotBounds[i].second);
     }
     else{
       tmpiso = NULL;
@@ -246,13 +254,13 @@ template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithR
 	  if(plotiso[n+1] ){
 	    for(unsigned int j =  0 ; j < isoNames[n+1].size() ;j++  ){
 	      edm::Handle<edm::AssociationMap<edm::OneToValue< T , float > > > depMap; 
-	      if(depMap.isValid()){ //Map may not exist if only one candidate apsses a double filter
-		iEvent.getByLabel(isoNames[n+1].at(j).label(),depMap);
+	      iEvent.getByLabel(isoNames[n+1].at(j).label(),depMap);
+	      if(depMap.isValid()){ //Map may not exist if only one candidate passes a double filter
 		typename edm::AssociationMap<edm::OneToValue< T , float > >::const_iterator mapi = depMap->find(recoecalcands[i]);
 		if(mapi!=depMap->end()){  // found candidate in isolation map! 
 		  etahistiso[n+1]->Fill(recoecalcands[i]->eta(),mapi->val);
-		ethistiso[n+1]->Fill(recoecalcands[i]->et(),mapi->val);
-		break; // to avoid multiple filling we only look until we found the candidate once.
+		  ethistiso[n+1]->Fill(recoecalcands[i]->et(),mapi->val);
+		  break; // to avoid multiple filling we only look until we found the candidate once.
 		}
 	      }
 	    }

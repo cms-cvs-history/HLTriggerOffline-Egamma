@@ -23,8 +23,9 @@ process.source = cms.Source("PoolSource",
         '/store/relval/CMSSW_2_1_4/RelValWE/GEN-SIM-DIGI-RAW-HLTDEBUG/STARTUP_V5_v1/0005/B25CA5CA-8A6C-DD11-8884-000423D6B358.root')
 )
 
-process.load("HLTriggerOffline.Egamma.EgammaValidation_Wenu_cff")
-process.test = cms.Path(process.egammavalWenu)
+process.load("HLTriggerOffline.Egamma.EgammaValidation_cff")
+process.testW = cms.Path(process.egammavalWenu)
+process.testZ = cms.Path(process.egammavalZee)
 
 process.load("DQMServices.Core.DQM_cfg")
 

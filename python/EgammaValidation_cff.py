@@ -63,7 +63,7 @@ for trig in paths:
     clon = trig + '_W = ' + trig + '.clone()'
     exec clon
     #adjust MC match pid
-    mcmatch = trig + '_Z.pdgGen=11'
+    mcmatch = trig + '_W.pdgGen=11'
     exec mcmatch
     Wseq=Wseq + trig + '_W' 
 

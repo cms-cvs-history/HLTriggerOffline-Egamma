@@ -1,18 +1,20 @@
 import FWCore.ParameterSet.Config as cms
 
-paths = ['veryHighEtDQM',
-         'singlePhotonRelaxedDQM',
-         'singlePhotonDQM',
-         'singleElectronRelaxedDQM',
-         'singleElectronDQM',
-         'singleElectronRelaxedLargeWindowDQM', 
-         'singleElectronLargeWindowDQM',
-         'highEtDQM',
-         'doublePhotonRelaxedDQM',
-         'doublePhotonDQM', 
-         'doubleElectronRelaxedDQM',
-         'doubleElectronDQM']
+pathsElectron = ['veryHighEtDQM',
+                 'highEtDQM',
+                 'singleElectronRelaxedDQM',
+                 'singleElectronDQM',
+                 'singleElectronRelaxedLargeWindowDQM', 
+                 'singleElectronLargeWindowDQM',
+                 'doubleElectronRelaxedDQM',
+                 'doubleElectronDQM']
 
+pathsPhoton = ['veryHighEtDQM',
+               'highEtDQM',
+               'singlePhotonRelaxedDQM',
+               'singlePhotonDQM',
+               'doublePhotonRelaxedDQM',
+               'doublePhotonDQM']
 
 #define common modules
 leptons = cms.EDFilter("PdgIdAndStatusCandViewSelector",
@@ -40,9 +42,18 @@ selW = cms.EDFilter("CandViewCountFilter",
 )
 Wseq='*('
 
+selPJ = cms.EDFilter("CandViewCountFilter",
+    src = cms.InputTag("cutPhoton"),
+    minNumber = cms.uint32(1)
+)
+PJseq='*('
+
+###########################################################
+#  Electron DQM
+
 first= True
 #load modules
-for trig in paths:
+for trig in pathsElectron:
     if not first:
         Zseq=Zseq+'+'
         Wseq=Wseq+'+'
@@ -65,13 +76,49 @@ for trig in paths:
     #adjust MC match pid
     mcmatch = trig + '_W.pdgGen=11'
     exec mcmatch
-    Wseq=Wseq + trig + '_W' 
+    Wseq=Wseq + trig + '_W'
 
 Zseq=Zseq + ')'
 Wseq=Wseq + ')'
+###########################################################
 
 
-scom = 'egammavalZee = cms.Sequence(leptons*cut*selZ' + Zseq +')'
+###########################################################
+#  Photon DQM
+
+first= True
+#load modules
+for trig in pathsPhoton:
+    if not first:
+       PJseq=PJseq+'+'
+    first= False
+    
+    imp = 'from HLTriggerOffline.Egamma.' + trig + '_cfi import *'
+    exec imp
+
+    #clone for Photon+Jet
+    clon = trig + '_PJ = ' + trig + '.clone()'
+    exec clon
+    #adjust MC match pid
+    mcmatch = trig + '_PJ.pdgGen=22'
+    exec mcmatch
+    PJseq=PJseq + trig + '_PJ'
+
+PJseq=PJseq + ')'
+###########################################################
+
+
+###########################################################
+# Electron DQM
+#scom = 'egammavalZee = cms.Sequence(leptons*cut*selZ' + Zseq +')'
+scom = 'egammavalZee = cms.Sequence(leptons*cut' + Zseq +')'
 exec scom
-scom = 'egammavalWenu = cms.Sequence(leptons*cut*selW' + Wseq +')'
+#scom = 'egammavalWenu = cms.Sequence(leptons*cut*selW' + Wseq +')'
+scom = 'egammavalWenu = cms.Sequence(leptons*cut' + Wseq +')'
+exec scom
+
+# Photon DQM
+leptons.pdgId=cms.vint32(22)
+#scom = 'egammavalPhotonJet = cms.Sequence(leptons*cut*selPJ' + PJseq +')'
+scom = 'egammavalPhotonJet = cms.Sequence(leptons*cut' + PJseq +')'
 exec scom

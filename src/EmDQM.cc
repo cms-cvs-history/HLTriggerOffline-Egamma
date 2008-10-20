@@ -167,6 +167,17 @@ EmDQM::~EmDQM(){
 void 
 EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup)
 {
+  
+  ////////////////////////////////////////////////////////////
+  //           Check if there's enough gen particles        //
+  //             of interest                                //
+  ////////////////////////////////////////////////////////////
+  edm::Handle< edm::View<reco::Candidate> > cutCounter;
+  event.getByLabel("cut",cutCounter);
+  if (cutCounter->size() < reqNum) {
+    //edm::LogWarning("EmDQM") << "Less than "<< reqNum <<" gen particles with pdgId=" << pdgGen;
+    return;
+  }
 
 
   // fill L1 and HLT info

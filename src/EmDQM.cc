@@ -44,8 +44,11 @@ using namespace ROOT::Math::VectorUtil ;
 EmDQM::EmDQM(const edm::ParameterSet& pset)  
 {
 
+
+
   dbe = edm::Service < DQMStore > ().operator->();
   dbe->setVerbose(0);
+
 
   ////////////////////////////////////////////////////////////
   //          Read from configuration file                  //
@@ -62,7 +65,11 @@ EmDQM::EmDQM(const edm::ParameterSet& pset)
   thePtMin  = pset.getUntrackedParameter<double>("PtMin",0.);
   thePtMax  = pset.getUntrackedParameter<double>("PtMax",1000.);
   theNbins  = pset.getUntrackedParameter<unsigned int>("Nbins",40);
-  
+
+  //preselction cuts 
+  gencutCollection_= pset.getParameter<edm::InputTag>("cutcollection");
+  gencut_          = pset.getParameter<int>("cutnum");
+
   ////////////////////////////////////////////////////////////
   //         Read in the Vector of Parameter Sets.          //
   //           Information for each filter-step             //
@@ -173,8 +180,8 @@ EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup)
   //             of interest                                //
   ////////////////////////////////////////////////////////////
   edm::Handle< edm::View<reco::Candidate> > cutCounter;
-  event.getByLabel("cut",cutCounter);
-  if (cutCounter->size() < reqNum) {
+  event.getByLabel(gencutCollection_,cutCounter);
+  if (cutCounter->size() < (unsigned int)gencut_) {
     //edm::LogWarning("EmDQM") << "Less than "<< reqNum <<" gen particles with pdgId=" << pdgGen;
     return;
   }

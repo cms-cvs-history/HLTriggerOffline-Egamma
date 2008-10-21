@@ -63,5 +63,8 @@ private:
   DQMStore * dbe;
   std::string dirname_;
 
+  edm::InputTag gencutCollection_;
+  int gencut_;
+
 };
 #endif

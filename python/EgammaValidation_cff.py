@@ -1,124 +1,100 @@
 import FWCore.ParameterSet.Config as cms
 
-pathsElectron = ['veryHighEtDQM',
-                 'highEtDQM',
-                 'singleElectronRelaxedDQM',
-                 'singleElectronDQM',
-                 'singleElectronRelaxedLargeWindowDQM', 
-                 'singleElectronLargeWindowDQM',
-                 'doubleElectronRelaxedDQM',
-                 'doubleElectronDQM']
+class dummy:
+    pass
 
-pathsPhoton = ['veryHighEtDQM',
-               'highEtDQM',
-               'singlePhotonRelaxedDQM',
-               'singlePhotonDQM',
-               'doublePhotonRelaxedDQM',
-               'doublePhotonDQM']
+samples=dummy()
+paths=dummy()
 
-#define common modules
-leptons = cms.EDFilter("PdgIdAndStatusCandViewSelector",
+##########################################################
+# Define which preselections to run                      #
+##########################################################
+
+samples.names = ['Wenu',
+                 'Zee',
+                 'GammaJet']
+samples.pdgid = [ 11,
+                  11,
+                  22]
+samples.num   = [1,
+                 2,
+                 1]
+
+#which triggers for which sample
+
+paths.Wenu = ['veryHighEtDQM',
+              'singlePhotonRelaxedDQM',
+              'singlePhotonDQM',
+              'singleElectronRelaxedDQM',
+              'singleElectronDQM',
+              'singleElectronRelaxedLargeWindowDQM',
+              'singleElectronLargeWindowDQM',
+              'highEtDQM']
+
+paths.Zee = paths.Wenu + ['doublePhotonRelaxedDQM',
+                          'doublePhotonDQM',
+                          'doubleElectronRelaxedDQM',
+                          'doubleElectronDQM']
+
+paths.GammaJet = ['veryHighEtDQM',
+                  'highEtDQM',
+                  'singlePhotonRelaxedDQM',
+                  'singlePhotonDQM',
+                  'doublePhotonRelaxedDQM',
+                  'doublePhotonDQM']
+
+
+##########################################################
+# produce generated paricles in acceptance               #
+##########################################################
+
+genp = cms.EDFilter("PdgIdAndStatusCandViewSelector",
     status = cms.vint32(1),
     src = cms.InputTag("genParticles"),
-    pdgId = cms.vint32(11)
-)
-cut = cms.EDFilter("EtaPtMinCandViewSelector",
-    src = cms.InputTag("leptons"),
-    etaMin = cms.double(-2.5),
-    etaMax = cms.double(2.5),
-    ptMin = cms.double(2.0)
+    pdgId = cms.vint32(11)  # replaced in loop
 )
 
-#define sequences/noncommon modules
-selZ = cms.EDFilter("CandViewCountFilter",
-    src = cms.InputTag("cut"),
-    minNumber = cms.uint32(2)
+fiducial = cms.EDFilter("EtaPtMinCandViewSelector",
+    src = cms.InputTag("fiducial"),
+    etaMin = cms.double(-2.5),  # to be replaced in loop ?
+    etaMax = cms.double(2.5),   # to be replaced in loop ?
+    ptMin = cms.double(2.0)     # to be replaced in loop ?
 )
-Zseq='*('
 
-selW = cms.EDFilter("CandViewCountFilter",
-    src = cms.InputTag("cut"),
-    minNumber = cms.uint32(1)
-)
-Wseq='*('
+##########################################################
+# loop over samples to create modules and sequence       #
+##########################################################
 
-selPJ = cms.EDFilter("CandViewCountFilter",
-    src = cms.InputTag("cutPhoton"),
-    minNumber = cms.uint32(1)
-)
-PJseq='*('
+tmp = cms.SequencePlaceholder("tmp")
+egammaValidationSequence = cms.Sequence(tmp)  # no empty sequences allowed, start with dummy
 
-###########################################################
-#  Electron DQM
+#loop over samples
+for samplenum in range(len(samples.names)):
 
-first= True
-#load modules
-for trig in pathsElectron:
-    if not first:
-        Zseq=Zseq+'+'
-        Wseq=Wseq+'+'
-    first= False    
+    # clone genparticles and select correct type
+    genpartname = "genpart"+samples.names[samplenum]
+    globals()[genpartname] = genp.clone()
+    setattr(globals()[genpartname],"pdgId",cms.vint32(samples.pdgid[samplenum]) ) # set pdgId
+    egammaValidationSequence *= globals()[genpartname]                            # add to sequence
 
-    imp = 'from HLTriggerOffline.Egamma.' + trig + '_cfi import *'
-    exec imp
+    # clone generator fiducial region
+    fiducialname = "fiducial"+samples.names[samplenum]
+    globals()[fiducialname] = fiducial.clone()
+    setattr(globals()[fiducialname],"src",cms.InputTag(genpartname) ) # set input collection
+    egammaValidationSequence *= globals()[fiducialname]               # add to sequence
 
-    #clone for Z
-    clon = trig + '_Z = ' + trig + '.clone()'
-    exec clon
-    #adjust MC match pid
-    mcmatch = trig + '_Z.pdgGen=11'
-    exec mcmatch
-    Zseq=Zseq + trig + '_Z' 
-
-    #clone for W
-    clon = trig + '_W = ' + trig + '.clone()'
-    exec clon
-    #adjust MC match pid
-    mcmatch = trig + '_W.pdgGen=11'
-    exec mcmatch
-    Wseq=Wseq + trig + '_W'
-
-Zseq=Zseq + ')'
-Wseq=Wseq + ')'
-###########################################################
+    # loop over triggers for each sample
+    for trig in getattr(paths,samples.names[samplenum]):
+        trigname = trig + samples.names[samplenum]
+        #import appropriate config snippet
+        filename = "HLTriggerOffline.Egamma."+trig+"_cfi"
+        trigdef =__import__( filename )
+        import sys
+        globals()[trigname] = getattr(sys.modules[filename],trig).clone()    # clone imported config
+        setattr(globals()[trigname],"cutcollection",cms.InputTag(fiducialname))        # set preselacted generator collection
+        setattr(globals()[trigname],"cutnum",cms.int32( samples.num[samplenum]  )) # cut value for preselection
+        setattr(globals()[trigname],"pdgGen",cms.int32( samples.pdgid[samplenum])) #correct pdgId for MC matching
+        egammaValidationSequence *= globals()[trigname]                      # add to sequence
 
 
-###########################################################
-#  Photon DQM
-
-first= True
-#load modules
-for trig in pathsPhoton:
-    if not first:
-       PJseq=PJseq+'+'
-    first= False
-    
-    imp = 'from HLTriggerOffline.Egamma.' + trig + '_cfi import *'
-    exec imp
-
-    #clone for Photon+Jet
-    clon = trig + '_PJ = ' + trig + '.clone()'
-    exec clon
-    #adjust MC match pid
-    mcmatch = trig + '_PJ.pdgGen=22'
-    exec mcmatch
-    PJseq=PJseq + trig + '_PJ'
-
-PJseq=PJseq + ')'
-###########################################################
-
-
-###########################################################
-# Electron DQM
-#scom = 'egammavalZee = cms.Sequence(leptons*cut*selZ' + Zseq +')'
-scom = 'egammavalZee = cms.Sequence(leptons*cut' + Zseq +')'
-exec scom
-#scom = 'egammavalWenu = cms.Sequence(leptons*cut*selW' + Wseq +')'
-scom = 'egammavalWenu = cms.Sequence(leptons*cut' + Wseq +')'
-exec scom
-
-# Photon DQM
-leptons.pdgId=cms.vint32(22)
-#scom = 'egammavalPhotonJet = cms.Sequence(leptons*cut*selPJ' + PJseq +')'
-scom = 'egammavalPhotonJet = cms.Sequence(leptons*cut' + PJseq +')'
-exec scom
+egammaValidationSequence.remove(tmp)  # remove the initial dummy

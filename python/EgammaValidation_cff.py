@@ -23,18 +23,15 @@ samples.num   = [1,
 #which triggers for which sample
 
 paths.Wenu = ['veryHighEtDQM',
-              'singlePhotonRelaxedDQM',
-              'singlePhotonDQM',
               'singleElectronRelaxedDQM',
               'singleElectronDQM',
-              'singleElectronRelaxedLargeWindowDQM',
-              'singleElectronLargeWindowDQM',
+              'looseIsoEle15LWL1RDQM',
+              'ele15SWL1RDQM',
               'highEtDQM']
 
-paths.Zee = paths.Wenu + ['doublePhotonRelaxedDQM',
-                          'doublePhotonDQM',
-                          'doubleElectronRelaxedDQM',
-                          'doubleElectronDQM']
+paths.Zee = paths.Wenu + ['doubleElectronRelaxedDQM',
+                          'doubleElectronDQM',
+                          'doubleEle5SWL1RDQM']
 
 paths.GammaJet = ['veryHighEtDQM',
                   'highEtDQM',

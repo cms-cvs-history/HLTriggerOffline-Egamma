@@ -21,6 +21,10 @@ EmDQMPostProcessor::EmDQMPostProcessor(const edm::ParameterSet& pset)
 
 void EmDQMPostProcessor::endRun(edm::Run const& run, edm::EventSetup const& es)
 {
+  //////////////////////////////////
+  // setup DQM stor               //
+  //////////////////////////////////
+  
   DQMStore * dqm = 0;
   dqm = edm::Service<DQMStore>().operator->();
 
@@ -37,11 +41,17 @@ void EmDQMPostProcessor::endRun(edm::Run const& run, edm::EventSetup const& es)
     return;
   }
 
-  
-  //loop over all triggers/samples
+  //////////////////////////////////
+  //loop over all triggers/samples//
+  //////////////////////////////////
+
   std::vector<std::string> subdirectories = dqm->getSubdirs();
   for(std::vector<std::string>::iterator dir = subdirectories.begin() ;dir!= subdirectories.end(); dir++ ){
     dqm->cd(*dir);
+
+    /////////////////////////////////////
+    // computer per-event efficiencies //
+    /////////////////////////////////////
 
     MonitorElement* total = dqm->book1D("efficiency by step",dqm->get(dqm->pwd() + "/total eff")->getTH1F());
     total->setTitle("efficiency by step");
@@ -100,6 +110,36 @@ void EmDQMPostProcessor::endRun(edm::Run const& run, edm::EventSetup const& es)
     total->getTH1F()->SetMaximum(1.2);
     total->getTH1F()->SetMinimum(0);
 
+    ///////////////////////////////////////////
+    // compute per-object efficiencies       //
+    ///////////////////////////////////////////
+    MonitorElement *eff,*num,*denom;
+    std::vector<std::string> varnames; varnames.push_back("eta"); varnames.push_back("et");
+    std::string filtername;      
+    std::string filtername2;
+    std::string denomname;
+    std::string numname;
+    // get the filter names from the bin-labels of the master-histogram
+    for(int filter=1;filter < total->getNbinsX()-2; filter++){
+      filtername = total->getTH1F()->GetXaxis()->GetBinLabel(filter);
+      filtername2= total->getTH1F()->GetXaxis()->GetBinLabel(filter+1);
+
+      //loop over variables (eta/et)
+      for(std::vector<std::string>::iterator var = varnames.begin(); var != varnames.end() ; var++){
+	numname  = dqm->pwd() + "/"+ filtername2 + *var;
+	denomname= dqm->pwd() + "/"+ filtername + *var;
+	num   =dqm->get(numname);
+	denom =dqm->get(denomname);
+	if(!num || !denom) break; // dont try to devide if the histos aren't there
+	eff = dqm->book1D("efficiency "+filtername2+" vs "+*var,dqm->get(numname)->getTH1F());
+	if(!dqm) break; // couldnt create new element => don't fill it;
+	eff->setTitle("efficiency "+filtername2+"vs "+*var);
+	eff->getTH1F()->SetMaximum(1.2);
+	eff->getTH1F()->SetMinimum(0);
+	eff->getTH1F()->GetXaxis()->SetTitle(var->c_str());
+	eff->getTH1F()->Divide(num->getTH1F(),denom->getTH1F(),1,1,"b" );
+      }
+    }
 
     dqm->goUp();
   }

@@ -52,7 +52,7 @@ genp = cms.EDFilter("PdgIdAndStatusCandViewSelector",
 )
 
 fiducial = cms.EDFilter("EtaPtMinCandViewSelector",
-    src = cms.InputTag("fiducial"),
+    src = cms.InputTag("genp"),
     etaMin = cms.double(-2.5),  # to be replaced in loop ?
     etaMax = cms.double(2.5),   # to be replaced in loop ?
     ptMin = cms.double(2.0)     # to be replaced in loop ?

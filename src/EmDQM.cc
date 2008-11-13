@@ -123,23 +123,25 @@ EmDQM::beginJob(const edm::EventSetup&)
   MonitorElement* tmpiso;
 
   // Generator-level histograms
+  std::string pdgIdString= Form("w/pdgId=%d",pdgGen);
+
   histName  = "gen et";
-  histTitle = "Et of Gen Particles";
+  histTitle = "Et of Gen Particles "+pdgIdString;
   etgen     =       dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, plotPtMin, plotPtMax);
   histName  = "gen eta";
-  histTitle = "Eta of Gen Particles";
+  histTitle = "Eta of Gen Particles "+pdgIdString;
   etagen    =       dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, -plotEtaMax, plotEtaMax);
   histName  = "gen et highest";
-  histTitle = "Et of Highest Et Gen Particle";
+  histTitle = "Et of Highest Et Gen Particle "+pdgIdString;
   etgenHighestEt  = dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, plotPtMin, plotPtMax);
   histName  = "gen eta highest";
-  histTitle = "Eta of Highest Et Gen Particle";
+  histTitle = "Eta of Highest Et Gen Particle "+pdgIdString;
   etagenHighestEt = dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, -plotEtaMax, plotEtaMax); 
   histName  = "gen et 2nd highest";
-  histTitle = "Et of 2nd Highest Et Gen Particle";
+  histTitle = "Et of 2nd Highest Et Gen Particle "+pdgIdString;
   etgen2ndHighestEt = dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, plotPtMin, plotPtMax);
   histName  = "gen eta 2nd highest";
-  histTitle = "Eta of 2nd Highest Et Gen Particle";
+  histTitle = "Eta of 2nd Highest Et Gen Particle "+pdgIdString;
   etagen2ndHighestEt = dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, -plotEtaMax, plotEtaMax);
 
   // HLT histograms

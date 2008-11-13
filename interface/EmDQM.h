@@ -40,11 +40,29 @@ private:
   std::vector<std::vector<edm::InputTag> > isoNames; // there has to be a better solution
   std::vector<std::pair<double,double> > plotBounds; 
   std::string theHltName;
-  unsigned int reqNum;
-  double thePtMin ;
-  double thePtMax ;
-  unsigned int theNbins ;
 
+  ////////////////////////////////////////////////////////////
+  //          Read from configuration file                  //
+  ////////////////////////////////////////////////////////////
+  // paramters for generator study
+  unsigned int reqNum;
+  int    pdgGen;
+  double genEtaAcc;
+  double genEtAcc;
+  // plotting paramters
+  double plotEtaMax;
+  double plotPtMin;
+  double plotPtMax;
+  unsigned int plotBins;
+  // preselction cuts
+  edm::InputTag gencutCollection_;
+  int gencut_;
+  ////////////////////////////////////////////////////////////
+
+
+  ////////////////////////////////////////////////////////////
+  //          Create Histograms                             //
+  ////////////////////////////////////////////////////////////
   std::vector<MonitorElement*> etahist;
   std::vector<MonitorElement*> ethist;
   std::vector<MonitorElement*> etahistmatch;
@@ -52,19 +70,18 @@ private:
   std::vector<MonitorElement*> etahistiso;
   std::vector<MonitorElement*> ethistiso;
   MonitorElement* total;
+  // Generator-level Histograms
   MonitorElement* etgen;
   MonitorElement* etagen;
-  int   pdgGen;
-  double genEtaAcc;
-  double genEtAcc;
+  MonitorElement* etgenHighestEt;
+  MonitorElement* etagenHighestEt;
+  MonitorElement* etgen2ndHighestEt;
+  MonitorElement* etagen2ndHighestEt;
 
   template <class T> void fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& ,const edm::Event& ,unsigned int, std::vector<HepMC::GenParticle>& );
   
   DQMStore * dbe;
   std::string dirname_;
-
-  edm::InputTag gencutCollection_;
-  int gencut_;
 
 };
 #endif

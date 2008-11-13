@@ -56,17 +56,18 @@ EmDQM::EmDQM(const edm::ParameterSet& pset)
   dirname_="HLT/HLTEgammaValidation/"+pset.getParameter<std::string>("@module_label");
   dbe->setCurrentFolder(dirname_);
 
-  // paramters for generator study 
+  // paramters for generator study
   reqNum    = pset.getParameter<unsigned int>("reqNum");
   pdgGen    = pset.getParameter<int>("pdgGen");
   genEtaAcc = pset.getParameter<double>("genEtaAcc");
   genEtAcc  = pset.getParameter<double>("genEtAcc");
   // plotting paramters (untracked because they don't affect the physics)
-  thePtMin  = pset.getUntrackedParameter<double>("PtMin",0.);
-  thePtMax  = pset.getUntrackedParameter<double>("PtMax",1000.);
-  theNbins  = pset.getUntrackedParameter<unsigned int>("Nbins",40);
+  plotEtaMax = pset.getUntrackedParameter<double>("EtaMax", 4.0);
+  plotPtMin  = pset.getUntrackedParameter<double>("PtMin" , 0.);
+  plotPtMax  = pset.getUntrackedParameter<double>("PtMax" , 1000.);
+  plotBins   = pset.getUntrackedParameter<unsigned int>("Nbins", 40);
 
-  //preselction cuts 
+  // preselction cuts
   gencutCollection_= pset.getParameter<edm::InputTag>("cutcollection");
   gencut_          = pset.getParameter<int>("cutnum");
 
@@ -86,13 +87,16 @@ EmDQM::EmDQM(const edm::ParameterSet& pset)
     // If the size of plot "bounds" vector != 2, abort
     assert(bounds.size() == 2);
     plotBounds.push_back(std::pair<double,double>(bounds[0],bounds[1]));
+
+    // Grab "IsoCollections" from config file
     isoNames.push_back(filterconf->getParameter<std::vector<edm::InputTag> >("IsoCollections"));
     // If the size of the isoNames vector is not greater than zero, abort
     assert(isoNames.back().size()>0);
-    if (isoNames.back().at(0).label()=="none")
+    if (isoNames.back().at(0).label()=="none") {
       plotiso.push_back(false);
-    else
+    } else {
       plotiso.push_back(true);
+    }
 
   } // END of loop over parameter sets
 }
@@ -106,10 +110,11 @@ EmDQM::beginJob(const edm::EventSetup&)
 {
   //edm::Service<TFileService> fs;
   dbe->setCurrentFolder(dirname_);
-  
-  std::string histoname="total eff";
 
-  total = dbe->book1D(histoname.c_str(),histoname.c_str(),theHLTCollectionLabels.size()+2,0,theHLTCollectionLabels.size()+2);
+  std::string histName  = "total eff";
+  std::string histTitle = "Total Efficiency";
+
+  total = dbe->book1D(histName.c_str(),histTitle.c_str(),theHLTCollectionLabels.size()+2,0,theHLTCollectionLabels.size()+2);
   total->setBinLabel(theHLTCollectionLabels.size()+1,"Total");
   total->setBinLabel(theHLTCollectionLabels.size()+2,"Gen");
   for (unsigned int u=0; u<theHLTCollectionLabels.size(); u++){total->setBinLabel(u+1,theHLTCollectionLabels[u].label().c_str());}
@@ -117,47 +122,74 @@ EmDQM::beginJob(const edm::EventSetup&)
   MonitorElement* tmphisto;
   MonitorElement* tmpiso;
 
-  histoname = "gen et";
-  etgen =  dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
-  histoname = "gen eta";
-  etagen = dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
- 
-  for(unsigned int i = 0; i< theHLTCollectionLabels.size() ; i++){
-    histoname = theHLTCollectionLabels[i].label()+"et";
-    tmphisto =  dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
+  // Generator-level histograms
+  histName  = "gen et";
+  histTitle = "Et of Gen Particles";
+  etgen     =       dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, plotPtMin, plotPtMax);
+  histName  = "gen eta";
+  histTitle = "Eta of Gen Particles";
+  etagen    =       dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, -plotEtaMax, plotEtaMax);
+  histName  = "gen et highest";
+  histTitle = "Et of Highest Et Gen Particle";
+  etgenHighestEt  = dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, plotPtMin, plotPtMax);
+  histName  = "gen eta highest";
+  histTitle = "Eta of Highest Et Gen Particle";
+  etagenHighestEt = dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, -plotEtaMax, plotEtaMax); 
+  histName  = "gen et 2nd highest";
+  histTitle = "Et of 2nd Highest Et Gen Particle";
+  etgen2ndHighestEt = dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, plotPtMin, plotPtMax);
+  histName  = "gen eta 2nd highest";
+  histTitle = "Eta of 2nd Highest Et Gen Particle";
+  etagen2ndHighestEt = dbe->book1D(histName.c_str(), histTitle.c_str(), plotBins, -plotEtaMax, plotEtaMax);
+
+  // HLT histograms
+  for (unsigned int i = 0 ; i < theHLTCollectionLabels.size() ; i++){
+
+    // Et distribution
+    histName  = theHLTCollectionLabels[i].label()+"et";
+    histTitle = theHLTCollectionLabels[i].label()+" Et";
+    tmphisto  = dbe->book1D(histName.c_str(),histTitle.c_str(),plotBins,plotPtMin,plotPtMax);
     ethist.push_back(tmphisto);
     
-    histoname = theHLTCollectionLabels[i].label()+"eta";
-    tmphisto =  dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
-    etahist.push_back(tmphisto);          
+    // eta distribution
+    histName  = theHLTCollectionLabels[i].label()+"eta";
+    histTitle = theHLTCollectionLabels[i].label()+" eta";
+    tmphisto  = dbe->book1D(histName.c_str(),histTitle.c_str(),plotBins,-plotEtaMax,plotEtaMax);
+    etahist.push_back(tmphisto);
 
-    histoname = theHLTCollectionLabels[i].label()+"et MC matched";
-    tmphisto =  dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax);
+    // Et distribution of Monte-Carlo Matched objects
+    histName  = theHLTCollectionLabels[i].label()+"et MC matched";
+    histTitle = theHLTCollectionLabels[i].label()+" Et MC matched";
+    tmphisto  = dbe->book1D(histName.c_str(),histName.c_str(),plotBins,plotPtMin,plotPtMax);
     ethistmatch.push_back(tmphisto);
     
-    histoname = theHLTCollectionLabels[i].label()+"eta MC matched";
-    tmphisto =  dbe->book1D(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7);
+    // eta distribution of Monte-Carlo Matched objects
+    histName  = theHLTCollectionLabels[i].label()+"eta MC matched";
+    histTitle = theHLTCollectionLabels[i].label()+" eta MC matched";
+    tmphisto  = dbe->book1D(histName.c_str(),histTitle.c_str(),plotBins,-plotEtaMax,plotEtaMax);
     etahistmatch.push_back(tmphisto);          
-    
-    if(plotiso[i]) {
-      histoname = theHLTCollectionLabels[i].label()+"eta isolation";
-      tmpiso = dbe->book2D(histoname.c_str(),histoname.c_str(),theNbins,-2.7,2.7,theNbins,plotBounds[i].first,plotBounds[i].second);
-    }
-    else {
+   
+    // Isolation values vs eta
+    if (plotiso[i]) {
+      histName  = theHLTCollectionLabels[i].label()+"eta isolation";
+      histTitle = theHLTCollectionLabels[i].label()+" isolation vs eta";
+      tmpiso    = dbe->book2D(histName.c_str(),histTitle.c_str(),plotBins,-plotEtaMax,plotEtaMax,plotBins,plotBounds[i].first,plotBounds[i].second);
+    } else {
       tmpiso = NULL;
     }
     etahistiso.push_back(tmpiso);
 
-    if(plotiso[i]){
-      histoname = theHLTCollectionLabels[i].label()+"et isolation";
-      tmpiso = dbe->book2D(histoname.c_str(),histoname.c_str(),theNbins,thePtMin,thePtMax,theNbins,plotBounds[i].first,plotBounds[i].second);
-    }
-    else{
+    // Isolation values vs et
+    if (plotiso[i]) {
+      histName  = theHLTCollectionLabels[i].label()+"et isolation";
+      histTitle = theHLTCollectionLabels[i].label()+" isolation vs Et";
+      tmpiso    = dbe->book2D(histName.c_str(),histTitle.c_str(),plotBins,plotPtMin,plotPtMax,plotBins,plotBounds[i].first,plotBounds[i].second);
+    } else {
       tmpiso = NULL;
     }
     ethistiso.push_back(tmpiso);
 
-  }
+  } // END of HLT histograms
 }
 
 
@@ -209,25 +241,56 @@ EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup)
   std::vector<HepMC::GenParticle> mcparts;
   const HepMC::GenEvent * myGenEvent = genEvt->GetEvent();
   unsigned int ncand = 0;
+  float highestEtFound  = -1.0;
+  float highestEtFound2 = -2.0;
+  float etaOfHighestEtFound = -20.0;
+  float etaOfHighestEtFound2 = -20.0;
+  
   for ( HepMC::GenEvent::particle_const_iterator p = myGenEvent->particles_begin(); p != myGenEvent->particles_end(); ++p ) {
 
     // If the ID number is not what we're looking for or 
     //  it's status is !=1, go to the next particle
     if (  !( abs((*p)->pdg_id())==pdgGen  && (*p)->status()==1 )  )  continue;
+
+    // Grab particle information
     float eta   = (*p)->momentum().eta();
     float e     = (*p)->momentum().e();
     float theta = 2*atan(exp(-eta));
     float Et    = e*sin(theta);
-    if ( fabs(eta)<genEtaAcc  &&  Et > genEtAcc ) 
-    {
+
+    if ( fabs(eta)<genEtaAcc  &&  Et > genEtAcc ) {
+      // Store particle info if eta and Et within acceptance
       ncand++;
       etgen->Fill(Et);
       etagen->Fill(eta);
       mcparts.push_back(*(*p));
     }
+
+    if ( Et > highestEtFound ) {
+      // Store particle info if it's the highest Et found
+      highestEtFound2      = highestEtFound;
+      etaOfHighestEtFound2 = etaOfHighestEtFound;
+
+      highestEtFound = Et;
+      etaOfHighestEtFound = eta;
+    } else if ( Et > highestEtFound2 ) {
+      highestEtFound2 = Et;
+      etaOfHighestEtFound2 = eta;
+    }
   } // END of loop over Generated particles
+
+  if (highestEtFound > 0.0) {
+    // If we found a highest Et Gen particle, fill these
+    etgenHighestEt->Fill(highestEtFound);
+    etagenHighestEt->Fill(etaOfHighestEtFound);
+  }
+  if (highestEtFound2 > 0.0) {
+    etgen2ndHighestEt->Fill(highestEtFound2);
+    etagen2ndHighestEt->Fill(etaOfHighestEtFound2);
+  }
   if (ncand >= reqNum) total->Fill(theHLTCollectionLabels.size()+1.5);
-	  
+  ////////////////////////////////////////////////////////////
+
 
 
   ////////////////////////////////////////////////////////////
@@ -290,25 +353,28 @@ template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithR
       if (recoecalcands.size() >= reqNum ) 
 	total->Fill(n+0.5);
       for (unsigned int i=0; i<recoecalcands.size(); i++) {
+
 	//unmatched
 	ethist[n]->Fill(recoecalcands[i]->et() );
 	etahist[n]->Fill(recoecalcands[i]->eta() );
-	//matched
+
+        // Loop over all Generated Particles
+        //  to find one closest in delta-R
 	math::XYZVector candDir=recoecalcands[i]->momentum();
 	std::vector<HepMC::GenParticle>::iterator closest = mcparts.end();
 	double closestDr = 1000. ;
 	for(std::vector<HepMC::GenParticle>::iterator mc = mcparts.begin(); mc !=  mcparts.end() ; mc++){
 	  math::XYZVector mcDir( mc->momentum().px(),
 				 mc->momentum().py(),
-				 mc->momentum().pz());	  
+				 mc->momentum().pz());
 	  double dr = DeltaR(mcDir,candDir);
 	  if (dr < closestDr) {
 	    closestDr = dr;
 	    closest = mc;
 	  }
-	}
-	if (closest == mcparts.end())  
-          edm::LogWarning("EmDQM") << "no MC match, may skew efficieny";
+	} // END of loop over Gen Particles
+	if (closest == mcparts.end())
+          edm::LogWarning("EmDQM") << "Efficiency may become skewed: No match to gen particle with pdgId="<< pdgGen << " for RecoEcalCand with eta=" << recoecalcands[i]->eta() << ".";
 	else {
 	  float eta   = closest->momentum().eta();
 	  float e     = closest->momentum().e();

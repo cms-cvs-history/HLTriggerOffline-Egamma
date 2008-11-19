@@ -32,8 +32,10 @@ public:
   void endJob();
 
 private:
+
   // Input from cfg file
-  std::vector<edm::InputTag> theHLTCollectionLabels;  
+  std::vector<edm::InputTag> theHLTCollectionLabels; 
+  unsigned int numOfHLTCollectionLabels;  // Will be size of above vector
   edm::InputTag theL1Seed;
   std::vector<int> theHLTOutputTypes;
   std::vector<bool> plotiso;
@@ -63,13 +65,20 @@ private:
   ////////////////////////////////////////////////////////////
   //          Create Histograms                             //
   ////////////////////////////////////////////////////////////
-  std::vector<MonitorElement*> etahist;
-  std::vector<MonitorElement*> ethist;
-  std::vector<MonitorElement*> etahistmatch;
-  std::vector<MonitorElement*> ethistmatch;
-  std::vector<MonitorElement*> etahistiso;
-  std::vector<MonitorElement*> ethistiso;
-  MonitorElement* total;
+  // Et & eta distributions
+  std::vector<MonitorElement*> histEtOfHighEtMatch;
+  std::vector<MonitorElement*> histEtaOfHighEtMatch;
+  std::vector<MonitorElement*> histEtOfHighEtMatch2;
+  std::vector<MonitorElement*> histEtaOfHighEtMatch2;
+  // Isolation distributions
+  std::vector<MonitorElement*> histIsoVsEtOfHighEtMatch;
+  std::vector<MonitorElement*> histIsoVsEtaOfHighEtMatch;
+  std::vector<MonitorElement*> histIsoVsEtOfHighEtMatch2;
+  std::vector<MonitorElement*> histIsoVsEtaOfHighEtMatch2;
+  // Plots of efficiency vs step for
+  //  highest and 2nd highest Et particle
+  MonitorElement* histHighestEt;
+  MonitorElement* histHighestEt2;
   // Generator-level Histograms
   MonitorElement* etgen;
   MonitorElement* etagen;

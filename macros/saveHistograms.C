@@ -44,7 +44,7 @@ int lineColor = 4; // 2 = Red, 3 = Green, 4 = Blue
 int lineWidth = 2; // Line width for 1D histograms.
 
 Bool_t displayStatsBox = 1;  // 0 = false, 1 = true
-Bool_t autoLabelXaxis  = 0;
+Bool_t autoLabelXaxis  = 1;
 Bool_t autoLogYaxis    = 0;
 Bool_t printOutput     = 1;
 
@@ -111,17 +111,32 @@ void recurseOverKeys( TDirectory *target ) {
 
       TString histName = h->GetName(); 
 
+
+      ///////////////////////////////////////////
+      // Special & optional drawing commands
+
       // Now to label the X-axis!
       if (autoLabelXaxis) {
 	if ( histName.Contains("Phi") ) {
 	  h->GetXaxis()->SetTitle("#phi");
-	} else if ( histName.Contains("Eta") ) {
+	} else if ( histName.Contains("eta") || histName.Contains("eta2") ) {
 	  h->GetXaxis()->SetTitle("#eta");
 	} else if ( histName.Contains("Pt") ) {
 	  h->GetXaxis()->SetTitle("p_{T} (GeV)");
-	} else if ( histName.Contains("Et") ) {
+	} else if ( histName.Contains("et") || histName.Contains("et2") ) {
 	  h->GetXaxis()->SetTitle("E_{T} (GeV)");
 	}
+      }
+
+      // Tricky work-around.
+      //  Some plots have text labels that are too big.
+      //  Alter a margin to keep them in the picture.
+      if (histName.Contains("total ") || histName.Contains("efficiency by step")) {
+        canvasDefault->SetBottomMargin(0.24);
+	canvasDefault->SetRightMargin(0.15);
+      } else {
+	canvasDefault->SetBottomMargin(0.1);
+	canvasDefault->SetRightMargin(0.1);
       }
 
       h->SetLineColor(lineColor);
@@ -149,6 +164,9 @@ void recurseOverKeys( TDirectory *target ) {
       }
       // End of log or no-log y axis decision
       // ********************************
+
+      // END Special commands
+      ///////////////////////////////////////////
 
       h->Draw(drawOptions1D);
       canvasDefault->Modified();

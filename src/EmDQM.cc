@@ -65,10 +65,10 @@ EmDQM::EmDQM(const edm::ParameterSet& pset)
   genEtaAcc = pset.getParameter<double>("genEtaAcc");
   genEtAcc  = pset.getParameter<double>("genEtAcc");
   // plotting paramters (untracked because they don't affect the physics)
-  plotEtaMax = pset.getUntrackedParameter<double>("EtaMax", 4.0);
+  plotEtaMax = pset.getUntrackedParameter<double>("EtaMax", 3.0);
   plotPtMin  = pset.getUntrackedParameter<double>("PtMin" , 0.);
   plotPtMax  = pset.getUntrackedParameter<double>("PtMax" , 1000.);
-  plotBins   = pset.getUntrackedParameter<unsigned int>("Nbins", 40);
+  plotBins   = pset.getUntrackedParameter<unsigned int>("Nbins", 48);
 
   // preselction cuts
   gencutCollection_= pset.getParameter<edm::InputTag>("cutcollection");
@@ -343,6 +343,13 @@ EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup)
     }
   } // END of loop over Generated particles
 
+  // If the highest Et gen particle went out of the
+  // detector acceptance don't bother going on
+  if ( !( fabs(etaOfHighestEtFound)<genEtaAcc  && highestEtFound > genEtAcc ) ) {
+    edm::LogWarning("EmDQM") << "Not continuing with event. Highest Et gen particle with pdgGen="<<pdgGen << " had eta="<<etaOfHighestEtFound << " which is beyond acceptance.";
+    return;
+  }
+
   // Fill histograms
   if (highestEtFound > 0.0) {
     // If we found a highest Et Gen particle, fill these
@@ -363,11 +370,6 @@ EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup)
     histHighestEt2->Fill(numOfHLTCollectionLabels+1.5);
   }
 
-  // If the highest Et gen particle went out of the 
-  // detector acceptance don't bother going on
-  if ( !( fabs(etaOfHighestEtFound)<genEtaAcc  && highestEtFound > genEtAcc ) ) {
-    return;
-  }
 
   ////////////////////////////////////////////////////////////
   //            Loop over filter modules                    //

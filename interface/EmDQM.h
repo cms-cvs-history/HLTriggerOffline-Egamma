@@ -16,6 +16,7 @@
 #include <vector>
 #include "TDirectory.h"
 #include "HepMC/GenParticle.h"
+#include "PhysicsTools/Utilities/interface/PtComparator.h"
 
 class EmDQM : public edm::EDAnalyzer{
 public:
@@ -32,9 +33,8 @@ public:
   void endJob();
 
 private:
-
   // Input from cfg file
-  std::vector<edm::InputTag> theHLTCollectionLabels; 
+  std::vector<edm::InputTag> theHLTCollectionLabels;  
   unsigned int numOfHLTCollectionLabels;  // Will be size of above vector
   edm::InputTag theL1Seed;
   std::vector<int> theHLTOutputTypes;
@@ -48,49 +48,45 @@ private:
   ////////////////////////////////////////////////////////////
   // paramters for generator study
   unsigned int reqNum;
-  int    pdgGen;
+  int   pdgGen;
   double genEtaAcc;
   double genEtAcc;
   // plotting paramters
   double plotEtaMax;
-  double plotPtMin;
-  double plotPtMax;
-  unsigned int plotBins;
+  double plotPtMin ;
+  double plotPtMax ;
+  unsigned int plotBins ;
   // preselction cuts
   edm::InputTag gencutCollection_;
-  int gencut_;
-  ////////////////////////////////////////////////////////////
+  unsigned int gencut_;
 
 
   ////////////////////////////////////////////////////////////
   //          Create Histograms                             //
   ////////////////////////////////////////////////////////////
   // Et & eta distributions
-  std::vector<MonitorElement*> histEtOfHighEtMatch;
-  std::vector<MonitorElement*> histEtaOfHighEtMatch;
-  std::vector<MonitorElement*> histEtOfHighEtMatch2;
-  std::vector<MonitorElement*> histEtaOfHighEtMatch2;
+  std::vector<MonitorElement*> etahist;
+  std::vector<MonitorElement*> ethist;
+  std::vector<MonitorElement*> etahistmatch;
+  std::vector<MonitorElement*> ethistmatch;
   // Isolation distributions
-  std::vector<MonitorElement*> histIsoVsEtOfHighEtMatch;
-  std::vector<MonitorElement*> histIsoVsEtaOfHighEtMatch;
-  std::vector<MonitorElement*> histIsoVsEtOfHighEtMatch2;
-  std::vector<MonitorElement*> histIsoVsEtaOfHighEtMatch2;
-  // Plots of efficiency vs step for
-  //  highest and 2nd highest Et particle
-  MonitorElement* histHighestEt;
-  MonitorElement* histHighestEt2;
-  // Generator-level Histograms
+  std::vector<MonitorElement*> etahistiso;
+  std::vector<MonitorElement*> ethistiso;
+  std::vector<MonitorElement*> etahistisomatch;
+  std::vector<MonitorElement*> ethistisomatch;
+  // Plots of efficiency per step
+  MonitorElement* total;
+  MonitorElement* totalmatch;
+  //generator histograms
   MonitorElement* etgen;
   MonitorElement* etagen;
-  MonitorElement* etgenHighestEt;
-  MonitorElement* etagenHighestEt;
-  MonitorElement* etgen2ndHighestEt;
-  MonitorElement* etagen2ndHighestEt;
 
-  template <class T> void fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& ,const edm::Event& ,unsigned int, std::vector<HepMC::GenParticle>& );
-  
+  // interface to DQM framework
   DQMStore * dbe;
   std::string dirname_;
 
+  template <class T> void fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& ,const edm::Event& ,unsigned int, std::vector<reco::Particle>& );
+  GreaterByPt<reco::Particle> pTComparator_;
+  
 };
 #endif

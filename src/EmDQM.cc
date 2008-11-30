@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //                    Header file for this                                    //
 ////////////////////////////////////////////////////////////////////////////////
 #include "HLTriggerOffline/Egamma/interface/EmDQM.h"
@@ -126,7 +126,7 @@ EmDQM::beginJob(const edm::EventSetup&)
   total->setBinLabel(numOfHLTCollectionLabels+2,"Gen");
   for (unsigned int u=0; u<numOfHLTCollectionLabels; u++){total->setBinLabel(u+1,theHLTCollectionLabels[u].label().c_str());}
 
-  histName="total eff mc matched";
+  histName="total eff MC matched";
   histTitle="total events passing (mc matched)";
   totalmatch = dbe->book1D(histName.c_str(),histTitle.c_str(),numOfHLTCollectionLabels+2,0,numOfHLTCollectionLabels+2);
   totalmatch->setBinLabel(numOfHLTCollectionLabels+1,"Total");
@@ -281,6 +281,7 @@ EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup)
     etagen->Fill( sortedGen[i].eta() );
   } // END of loop over Generated particles
   if (gencut_ >= reqNum) total->Fill(numOfHLTCollectionLabels+1.5); // this isn't really needed anymore keep for backward comp.
+  if (gencut_ >= reqNum) totalmatch->Fill(numOfHLTCollectionLabels+1.5); // this isn't really needed anymore keep for backward comp.
 	  
 
   ////////////////////////////////////////////////////////////
@@ -377,6 +378,8 @@ template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithR
   //        Fill mc matched objects into histograms         //
   ////////////////////////////////////////////////////////////
   unsigned int mtachedMcParts = 0;
+  float mindist=0.3;
+  if(n==0) mindist=0.5; //low L1-resolution => allow wider matching 
   for(unsigned int i =0; i < gencut_; i++){
     //match generator candidate    
     bool matchThis= false;
@@ -389,7 +392,7 @@ template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithR
 	closestDr = dr;
 	closest = trigOb;
       }
-      if(closestDr>0.3){ // it's not really a "match" if it's that far away
+      if(closestDr > mindist){ // it's not really a "match" if it's that far away
 	closest = -1;
       }
       else{

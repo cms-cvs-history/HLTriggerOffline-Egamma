@@ -13,6 +13,7 @@
 #include "DataFormats/Common/interface/RefToBase.h"
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "DQMServices/Core/interface/MonitorElement.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include <vector>
 #include "TDirectory.h"
 #include "HepMC/GenParticle.h"

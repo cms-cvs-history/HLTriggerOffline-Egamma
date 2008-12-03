@@ -43,8 +43,6 @@ using namespace ROOT::Math::VectorUtil ;
 EmDQM::EmDQM(const edm::ParameterSet& pset)  
 {
 
-
-
   dbe = edm::Service < DQMStore > ().operator->();
   dbe->setVerbose(0);
 
@@ -64,7 +62,7 @@ EmDQM::EmDQM(const edm::ParameterSet& pset)
   plotPtMin  = pset.getUntrackedParameter<double>("PtMin",0.);
   plotPtMax  = pset.getUntrackedParameter<double>("PtMax",1000.);
   plotEtaMax = pset.getUntrackedParameter<double>("EtaMax", 2.7);
-  plotBins  = pset.getUntrackedParameter<unsigned int>("Nbins",40);
+  plotBins   = pset.getUntrackedParameter<unsigned int>("Nbins",40);
 
   //preselction cuts 
   gencutCollection_= pset.getParameter<edm::InputTag>("cutcollection");
@@ -153,7 +151,7 @@ EmDQM::beginJob(const edm::EventSetup&)
   histTitle= "E_{T} of " + pdgIdString + "s" ;
   etgen =  dbe->book1D(histName.c_str(),histTitle.c_str(),plotBins,plotPtMin,plotPtMax);
   histName = "gen eta";
-  histTitle= "E_{T} of "+ pdgIdString +"s " ;
+  histTitle= "#eta of "+ pdgIdString +"s " ;
   etagen = dbe->book1D(histName.c_str(),histTitle.c_str(),plotBins,-plotEtaMax,plotEtaMax);
  
   ////////////////////////////////////////////////////////////
@@ -256,10 +254,56 @@ EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup)
     return;
   }
 
+
+  ////////////////////////////////////////////////////////////
+  // Decide if this was an event of interest.               //
+  //  Did the highest energy particles happen               //
+  //  to have |eta| < 2.5 ?  Then continue.                 //
+  ////////////////////////////////////////////////////////////
+  edm::Handle< edm::View<reco::Candidate> > genParticles;
+  event.getByLabel("genParticles", genParticles);
+
+  std::vector<reco::GenParticle> allSortedGenParticles;
+
+  for(edm::View<reco::Candidate>::const_iterator currentGenParticle = genParticles->begin(); currentGenParticle != genParticles->end(); currentGenParticle++){
+
+    if (  !( abs((*currentGenParticle).pdgId())==pdgGen  && (*currentGenParticle).status()==1 && (*currentGenParticle).et() > 2.0)  )  continue;
+
+    reco::GenParticle tmpcand( *(currentGenParticle) );
+    allSortedGenParticles.push_back(tmpcand);
+  }
+
+  std::sort(allSortedGenParticles.begin(), allSortedGenParticles.end(),pTComparator_);
+
+  // Were enough high energy gen particles found?
+  if (allSortedGenParticles.size() < gencut_) {
+    // if no, throw event away
+    return;
+  }
+
+  // We now have a sorted collection of all generated particles
+  // with pdgId = pdgGen.
+  // Loop over them to see if the top gen particles have eta within acceptance
+  bool keepEvent = true;
+  for (unsigned int i = 0 ; i < gencut_ ; i++ ) {
+    bool inECALgap = fabs(allSortedGenParticles[i].eta()) > 1.4442 && fabs(allSortedGenParticles[i].eta()) < 1.556;
+    if ( (fabs(allSortedGenParticles[i].eta()) > genEtaAcc) || inECALgap ) {
+      //edm::LogWarning("EmDQM") << "Throwing event away. Gen particle with pdgId="<< allSortedGenParticles[i].pdgId() <<"; et="<< allSortedGenParticles[i].et() <<"; and eta="<< allSortedGenParticles[i].eta() <<" beyond acceptance.";
+      keepEvent=false;
+      break;
+    }
+  }
+  if (!keepEvent) {
+    return;
+  }
+
+
+  // It was an event worth keeping. Continue.
+
   ////////////////////////////////////////////////////////////
   //  Fill the bin labeled "Total"                          //
   //   This will be the number of events looked at.         //
-  //////////////////////////////////////////////////////////// 
+  ////////////////////////////////////////////////////////////
   total->Fill(numOfHLTCollectionLabels+0.5);
   totalmatch->Fill(numOfHLTCollectionLabels+0.5);
 

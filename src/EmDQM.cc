@@ -198,7 +198,7 @@ EmDQM::beginJob(const edm::EventSetup&)
 
       // 2D plot: Isolation values vs et for all objects
       histName  = theHLTCollectionLabels[i].label()+"et isolation";
-      histTitle = theHLTCollectionLabels[i].label()+" isolation vs Et for highest Et obj";
+      histTitle = theHLTCollectionLabels[i].label()+" isolation vs Et";
       tmpiso    = dbe->book2D(histName.c_str(),histTitle.c_str(),plotBins,plotPtMin,plotPtMax,plotBins,plotBounds[i].first,plotBounds[i].second);
       ethistiso.push_back(tmpiso);
 
@@ -210,7 +210,7 @@ EmDQM::beginJob(const edm::EventSetup&)
 
       // 2D plot: Isolation values vs et for matched objects
       histName  = theHLTCollectionLabels[i].label()+"et isolation MC matched";
-      histTitle = theHLTCollectionLabels[i].label()+" isolation vs Et for 2nd highest Et obj";
+      histTitle = theHLTCollectionLabels[i].label()+" isolation vs Et (mc matched)";
       tmpiso    = dbe->book2D(histName.c_str(),histTitle.c_str(),plotBins,plotPtMin,plotPtMax,plotBins,plotBounds[i].first,plotBounds[i].second);
       ethistisomatch.push_back(tmpiso);
     } // END of HLT histograms
@@ -320,8 +320,17 @@ EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup)
   }
   std::sort(sortedGen.begin(),sortedGen.end(),pTComparator_ );
 
+  // Now the collection of gen particles is sorted by pt.
+  // So, remove all particles from the collection so that we 
+  // only have the top "1 thru gencut_" particles in it
+  sortedGen.erase(sortedGen.begin()+gencut_,sortedGen.end());
+  if (gencut_ != sortedGen.size() ){
+    return;
+  }
+
+
   for (unsigned int i = 0 ; i < gencut_ ; i++ ) {
-    etgen->Fill( sortedGen[i].et() ); //validity has been implicitily checked by the cut on gencut_ above
+    etgen ->Fill( sortedGen[i].et()  ); //validity has been implicitily checked by the cut on gencut_ above
     etagen->Fill( sortedGen[i].eta() );
   } // END of loop over Generated particles
   if (gencut_ >= reqNum) total->Fill(numOfHLTCollectionLabels+1.5); // this isn't really needed anymore keep for backward comp.
@@ -356,7 +365,6 @@ EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup)
 ////////////////////////////////////////////////////////////////////////////////
 // fillHistos                                                                 //
 //   Called by analyze method.                                                //
-//   
 ////////////////////////////////////////////////////////////////////////////////
 template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithRefs>& triggerObj,const edm::Event& iEvent ,unsigned int n,std::vector<reco::Particle>& sortedGen)
 {
@@ -388,14 +396,42 @@ template <class T> void EmDQM::fillHistos(edm::Handle<trigger::TriggerEventWithR
 
 
   ////////////////////////////////////////////////////////////
-  //        Fill all filter objects into histograms         //
+  //  Loop over all HLT objects in this filter step, and    //
+  //  fill histograms only with the ones that have a        //
+  //  generator level match (in sortedGen)                  //
   ////////////////////////////////////////////////////////////
   if (recoecalcands.size() >= reqNum ) 
     total->Fill(n+0.5);
-  for (unsigned int i=0; i<recoecalcands.size(); i++) {
-    //unmatched
-    ethist[n]->Fill(recoecalcands[i]->et() );
+
+  ////////////////////////////////////////////////////////////
+  //  Loop over all HLT objects in this filter step, and    //
+  //  fill histograms only with the ones that have a        //
+  //  generator level match (in sortedGen)                  //
+  ////////////////////////////////////////////////////////////
+  bool foundAllMatches = false;
+  unsigned int numOfHLTobjectsMatched = 0;
+  for (unsigned int i=0; i<recoecalcands.size()&&!foundAllMatches; i++) {
+
+    // See if this HLT object has a gen-level match
+    float closestGenParticleDr = 99.0;
+    for(unsigned int j =0; j < gencut_; j++) {
+      math::XYZVector currentGenParticle = sortedGen[j].momentum();
+
+      double currentDeltaR = DeltaR(recoecalcands[i]->momentum(),currentGenParticle);
+      if ( currentDeltaR < closestGenParticleDr ) {
+        closestGenParticleDr = currentDeltaR;
+      }
+    }
+    // If this HLT object did not have a gen particle match, go to next HLT object
+    if ( !(fabs(closestGenParticleDr < 0.3)) ) continue;
+ 
+    numOfHLTobjectsMatched++;
+    if (numOfHLTobjectsMatched >= gencut_) foundAllMatches=true;
+
+    // Fill HLT object histograms
+    ethist[n] ->Fill(recoecalcands[i]->et() );
     etahist[n]->Fill(recoecalcands[i]->eta() );
+
     ////////////////////////////////////////////////////////////
     //  Plot isolation variables (show the not-yet-cut        //
     //  isolation, i.e. associated to next filter)            //

@@ -70,11 +70,15 @@ private:
   std::vector<MonitorElement*> ethist;
   std::vector<MonitorElement*> etahistmatch;
   std::vector<MonitorElement*> ethistmatch;
+  std::vector<MonitorElement*> histEtOfHltObjMatchToGen;
+  std::vector<MonitorElement*> histEtaOfHltObjMatchToGen;
   // Isolation distributions
   std::vector<MonitorElement*> etahistiso;
   std::vector<MonitorElement*> ethistiso;
   std::vector<MonitorElement*> etahistisomatch;
   std::vector<MonitorElement*> ethistisomatch;
+  std::vector<MonitorElement*> histEtIsoOfHltObjMatchToGen;
+  std::vector<MonitorElement*> histEtaIsoOfHltObjMatchToGen;
   // Plots of efficiency per step
   MonitorElement* total;
   MonitorElement* totalmatch;

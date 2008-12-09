@@ -1,0 +1,39 @@
+  module singlePhotonRelaxedDQM = EmDQM  { 
+  uint32 reqNum = 1 
+  int32  pdgGen = 22
+  double genEtaAcc = 2.5
+  double genEtAcc = 2.
+  VPSet filters = {
+   { InputTag  HLTCollectionLabels = hltL1seedRelaxedSingle::HLT
+     uint32    theHLTOutputTypes   = 82
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonL1MatchFilterRegional::HLT
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonEtFilter::HLT
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {none}
+     vdouble   PlotBounds          = {0,0}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonEcalIsolFilter::HLT
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {l1IsolatedPhotonEcalIsol::HLT,l1NonIsolatedPhotonEcalIsol::HLT}
+     vdouble   PlotBounds          = {0,10}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonHcalIsolFilter::HLT
+     uint32    theHLTOutputTypes   = 100
+     VInputTag IsoCollections      = {l1IsolatedPhotonHcalIsol::HLT,l1NonIsolatedPhotonHcalIsol::HLT}
+     vdouble   PlotBounds          = {0,10}
+   },
+   { InputTag  HLTCollectionLabels = hltL1NonIsoSinglePhotonTrackIsolFilter::HLT
+     uint32    theHLTOutputTypes   = 91
+     VInputTag IsoCollections      = {l1IsoPhotonTrackIsol::HLT,l1NonIsoPhotonTrackIsol::HLT}
+     vdouble   PlotBounds          = {0,10}
+   }
+  }
+  untracked double PtMax = 200
+ }

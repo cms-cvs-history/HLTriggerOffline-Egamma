@@ -28,9 +28,7 @@
 #include "FWCore/Utilities/interface/Exception.h"
 #include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
 #include "DataFormats/Common/interface/TriggerResults.h" 
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/HLTReco/interface/TriggerObject.h"
-#include "FWCore/Framework/interface/TriggerNames.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 ////////////////////////////////////////////////////////////////////////////////
 //                           Root include files                               //
@@ -79,6 +77,9 @@ EmDQMReco::EmDQMReco(const edm::ParameterSet& pset)
   // prescale = 10;
   eventnum = 0;
 
+  // just init
+  isHltConfigInitialized_ = false;
+
   ////////////////////////////////////////////////////////////
   //         Read in the Vector of Parameter Sets.          //
   //           Information for each filter-step             //
@@ -114,6 +115,21 @@ EmDQMReco::EmDQMReco(const edm::ParameterSet& pset)
   numOfHLTCollectionLabels = theHLTCollectionLabels.size();
   
 }
+
+
+
+///
+///
+///
+void EmDQMReco::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup ) {
+
+  bool isHltConfigChanged = false; // change of cfg at run boundaries?
+  isHltConfigInitialized_ = hltConfig_.init( iRun, iSetup, "HLT", isHltConfigChanged );
+
+}
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -315,6 +331,10 @@ EmDQMReco::~EmDQMReco(){
 void 
 EmDQMReco::analyze(const edm::Event & event , const edm::EventSetup& setup)
 {
+
+  // protect from hlt config failure
+  if( !isHltConfigInitialized_ ) return;
+
   eventnum++;
   bool plotMonpath = false;
   bool plotReco = true; 
@@ -344,10 +364,12 @@ EmDQMReco::analyze(const edm::Event & event , const edm::EventSetup& setup)
   
   edm::Handle<edm::TriggerResults> HLTR;
   event.getByLabel(edm::InputTag("TriggerResults","","HLT"), HLTR);
-  HLTConfigProvider hltConfig;
   
-  hltConfig.init("HLT");
-  unsigned int triggerIndex; 
+  ///
+  /// NOTE:
+  /// hltConfigProvider initialization has been moved to beginRun()
+  ///
+
   /* if (theHLTCollectionHumanNames[0] == "hltL1sRelaxedSingleEgammaEt8"){
     triggerIndex = hltConfig.triggerIndex("HLT_L1SingleEG8");
   } else if (theHLTCollectionHumanNames[0] == "hltL1sRelaxedSingleEgammaEt5") {
@@ -357,7 +379,9 @@ EmDQMReco::analyze(const edm::Event & event , const edm::EventSetup& setup)
   } else { 
     triggerIndex = hltConfig.triggerIndex("");
     } */
-  triggerIndex = hltConfig.triggerIndex("HLT_MinBias");
+
+  unsigned int triggerIndex; 
+  triggerIndex = hltConfig_.triggerIndex("HLT_MinBias");
   
   //triggerIndex must be less than the size of HLTR or you get a CMSException
   bool isFired = false;
@@ -687,4 +711,4 @@ void EmDQMReco::endJob(){
 
 }
 
-DEFINE_ANOTHER_FWK_MODULE(EmDQMReco);
+DEFINE_FWK_MODULE(EmDQMReco);

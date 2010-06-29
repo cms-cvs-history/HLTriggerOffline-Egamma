@@ -361,6 +361,10 @@ EmDQM::analyze(const edm::Event & event , const edm::EventSetup& setup)
   ////////////////////////////////////////////////////////////
   edm::Handle< edm::View<reco::GenParticle> > genParticles;
   event.getByLabel("genParticles", genParticles);
+  if(!genParticles.isValid()) { 
+    edm::LogWarning("EmDQM") << "genParticles invalid";
+    return;
+  }
 
   std::vector<reco::GenParticle> allSortedGenParticles;
 
